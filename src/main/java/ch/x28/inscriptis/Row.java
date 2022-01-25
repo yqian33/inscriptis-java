@@ -16,8 +16,6 @@
 package ch.x28.inscriptis;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -129,16 +127,9 @@ class Row {
 			for (int a = 0; a < lines.size(); a ++) {
 				zipped.add(lines.get(a).get(i));
 			}
-			System.out.println("zipped: " + zipped);
 			String rowLine = String.join(cellSeparator, zipped);
-			System.out.println("rowLine: " + rowLine);
 			rowLines.add(rowLine);
 		}
-		/*
-		row_lines = [self.cell_separator.join(line)
-                     for line in zip(*[column.blocks
-                                       for column in self.columns])]
-		 */
 
 		return String.join("\n", rowLines);
 	}

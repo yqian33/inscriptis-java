@@ -485,7 +485,7 @@ public class InscriptisTest {
 		ParserConfig parserConfig = new ParserConfig(rules);
 		parserConfig.setDisplayImages(true);
 
-		Document document = W3CDom.convert(Jsoup.parse(html3));
+		Document document = W3CDom.convert(Jsoup.parse(html2));
 		Inscriptis inscriptis = new Inscriptis(document, parserConfig);
 		String result = inscriptis.getText();
 		String n = inscriptis.getAnnotatedText();

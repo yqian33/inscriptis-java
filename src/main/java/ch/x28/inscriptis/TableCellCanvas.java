@@ -14,42 +14,6 @@ public class TableCellCanvas extends Canvas {
   private List<Integer> lineWidth;
   private Integer verticalPadding;
 
-  public HtmlProperties.HorizontalAlignment getAlign() {
-    return align;
-  }
-
-  public void setAlign(HtmlProperties.HorizontalAlignment align) {
-    this.align = align;
-  }
-
-  public HtmlProperties.VerticalAlignment getValign() {
-    return valign;
-  }
-
-  public void setValign(HtmlProperties.VerticalAlignment valign) {
-    this.valign = valign;
-  }
-
-  public void setWidth(Integer width) {
-    this.width = width;
-  }
-
-  public List<Integer> getLineWidth() {
-    return lineWidth;
-  }
-
-  public void setLineWidth(List<Integer> lineWidth) {
-    this.lineWidth = lineWidth;
-  }
-
-  public Integer getVerticalPadding() {
-    return verticalPadding;
-  }
-
-  public void setVerticalPadding(Integer verticalPadding) {
-    this.verticalPadding = verticalPadding;
-  }
-
   public TableCellCanvas(HtmlProperties.HorizontalAlignment align,
                          HtmlProperties.VerticalAlignment valign) {
     super();

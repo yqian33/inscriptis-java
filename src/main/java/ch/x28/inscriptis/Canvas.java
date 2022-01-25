@@ -27,7 +27,7 @@ public class Canvas {
   }
 
   private Long margin = 1000L; // margin to the previous block
-  public Line currentBlock = new Line(0L, new Prefix());
+  public Block currentBlock = new Block(0L, new Prefix());
   public List<String> blocks = new ArrayList<>();
   private List<Annotation> annotations = new ArrayList<>();
   private Map<HtmlElement, Long> openAnnotations = new HashMap<>();
@@ -36,32 +36,16 @@ public class Canvas {
     return margin;
   }
 
-  public void setMargin(Long margin) {
-    this.margin = margin;
-  }
-
-  public Line getCurrentBlock() {
+  public Block getCurrentBlock() {
     return currentBlock;
-  }
-
-  public void setCurrentBlock(Line currentBlock) {
-    this.currentBlock = currentBlock;
   }
 
   public List<String> getBlocks() {
     return blocks;
   }
 
-  public void setBlocks(List<String> blocks) {
-    this.blocks = blocks;
-  }
-
   public List<Annotation> getAnnotations() {
     return annotations;
-  }
-
-  public void setAnnotations(List<Annotation> annotations) {
-    this.annotations = annotations;
   }
 
   @Override
@@ -90,8 +74,7 @@ public class Canvas {
     if (!flushInline() && tag.getListBullet() != null) {
         writeUnconsumedBullet();
     }
-    System.out.println("tag:" + tag);
-    currentBlock.getPrefixObj().registerPrefix(tag.getPadding(), tag.getListBullet());
+    currentBlock.getPrefix().registerPrefix(tag.getPadding(), tag.getListBullet());
 
     int requiredMargin = Math.max(tag.getPreviousMarginAfter(), tag.getMarginBefore());
     if (requiredMargin > margin) {
@@ -109,7 +92,7 @@ public class Canvas {
       if (!flushInline() && tag.getListBullet()!= null) {
         writeUnconsumedBullet();
       }
-      currentBlock.getPrefixObj().removeLastPrefix();
+      currentBlock.getPrefix().removeLastPrefix();
       closeBlock(tag);
     }
 
@@ -135,10 +118,10 @@ public class Canvas {
   }
 
   public boolean flushInline() {
-    System.out.println("current block: "+ currentBlock.getContentText());
-    if (!StringUtils.isEmpty(currentBlock.getContentText())) {
-      blocks.add(currentBlock.getContentText());
-      currentBlock = currentBlock.newLine();
+    System.out.println("current block: "+ currentBlock.getText());
+    if (!StringUtils.isEmpty(currentBlock.getText())) {
+      blocks.add(currentBlock.getText());
+      currentBlock = currentBlock.newBlock();
       margin = 0L;
       return true;
     }
@@ -146,13 +129,13 @@ public class Canvas {
   }
 
   public void writeUnconsumedBullet() {
-    String bullet = currentBlock.getPrefixObj().getUnconsumedBullet();
+    String bullet = currentBlock.getPrefix().getUnconsumedBullet();
     if (bullet == null || bullet.isEmpty() ) {
       return;
     }
     blocks.add(bullet);
     currentBlock.setIndex(currentBlock.getIndex() + bullet.length());
-    currentBlock = currentBlock.newLine();
+    currentBlock = currentBlock.newBlock();
     margin = 0L;
   }
 
@@ -167,11 +150,11 @@ public class Canvas {
   public void writeNewLine() {
     if (!flushInline()) {
       blocks.add("");
-      currentBlock = currentBlock.newLine();
+      currentBlock = currentBlock.newBlock();
     }
   }
 
   public int getLeftMargin() {
-    return currentBlock.getPrefixObj().getCurrent_padding();
+    return currentBlock.getPrefix().getCurrent_padding();
   }
 }
