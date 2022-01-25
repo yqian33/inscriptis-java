@@ -126,6 +126,7 @@ public class Inscriptis {
 	 * @return the text representation of the HTML content
 	 */
 	public String getText() {
+
 		String text = cleanTextLines.stream()
 			.flatMap(lines -> lines.stream())
 			.collect(Collectors.joining("\n"));

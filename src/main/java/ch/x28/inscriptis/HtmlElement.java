@@ -85,18 +85,9 @@ public class HtmlElement {
 		return align;
 	}
 
-	public void setAlign(HtmlProperties.HorizontalAlignment align) {
-		this.align = align;
-	}
-
 	public HtmlProperties.VerticalAlignment getValign() {
 		return valign;
 	}
-
-	public void setValign(HtmlProperties.VerticalAlignment valign) {
-		this.valign = valign;
-	}
-
 
 	public String getListBullet() {
 		return listBullet;
@@ -105,8 +96,6 @@ public class HtmlElement {
 	public void setListBullet(String listBullet) {
 		this.listBullet = listBullet;
 	}
-
-
 
 	public List<String> getAnnotation() {
 		return annotation;
@@ -261,8 +250,6 @@ public class HtmlElement {
 	 */
 	public HtmlElement getRefinedHtmlElement(HtmlElement htmlElement) {
 
-		System.out.println("before refine:" + htmlElement);
-
 		Display display = this.display == Display.NONE
 			? Display.NONE
 			: htmlElement.getDisplay();
@@ -383,13 +370,6 @@ public class HtmlElement {
 			return;
 		}
 		canvas.write(this, prefix + text + suffix, null);
-	}
-
-	public void writeTail(String text) {
-		if (text == null || display == Display.NONE) {
-			return;
-		}
-		write(text);
 	}
 
 	public void writeVerbatimText(String text) {
