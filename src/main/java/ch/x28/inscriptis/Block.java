@@ -7,27 +7,24 @@ import java.util.List;
 
 public class Block extends Line {
 
+  private Long index;
+
   private boolean collapsableWhitespace = true;
 
-  private Prefix prefix;
+  private Prefix prefixObj;
 
   public Block(Long index, Prefix prefix) {
     this.setIndex(index);
-    this.prefix = prefix;
+    this.prefixObj = prefix;
   }
 
-
-  public Prefix getPrefix() {
-    return prefix;
-  }
-
-  public void setPrefix(Prefix prefix) {
-    this.prefix = prefix;
+  public Prefix getPrefixObj() {
+    return prefixObj;
   }
 
   public Block newBlock() {
-    this.prefix.setConsumed(false);
-    return new Block(this.getIndex()+1, this.prefix);
+    this.prefixObj.setConsumed(false);
+    return new Block(this.getIndex()+1, this.prefixObj);
   }
 
   @Override
@@ -66,29 +63,34 @@ public class Block extends Line {
     if (normalizedText.size() > 0) {
       String resText = String.join("", normalizedText);
       if (getContent() == null || getContent().isEmpty()) {
-        // System.out.println("line obj:" + this.prefixObj);
-        // System.out.println("prefix consumed:" + prefixObj.consumed);
-        resText = prefix.first() + resText;
+        resText = prefixObj.first() + resText;
       }
       // TODO:  unescape text
       resText = StringEscapeUtils.unescapeCsv(resText);
       resText = StringEscapeUtils.unescapeHtml(resText);
       addContent(resText);
-      Long newIndex = getIndex() + resText.length();
-      setIndex(newIndex);
+      index += resText.length();
     }
   }
 
   public void mergePreText(String text) {
-    String ntext = text.replace("\n", "\n"+ prefix.rest());
-    String resText = prefix.first() + ntext;
+    String ntext = text.replace("\n", "\n"+ prefixObj.rest());
+    String resText = prefixObj.first() + ntext;
     // TODO:  unescape text
     resText = StringEscapeUtils.unescapeCsv(resText);
     resText = StringEscapeUtils.unescapeHtml(resText);
     addContent(resText);
-    Long newIndex = getIndex() + resText.length();
-    setIndex(newIndex);
+    index += resText.length();
     collapsableWhitespace = false;
+  }
+
+
+  public Long getIndex() {
+    return index;
+  }
+
+  public void setIndex(Long index) {
+    this.index = index;
   }
 
 }

@@ -32,18 +32,6 @@ public class Canvas {
   private List<Annotation> annotations = new ArrayList<>();
   private Map<HtmlElement, Long> openAnnotations = new HashMap<>();
 
-  public Long getMargin() {
-    return margin;
-  }
-
-  public Block getCurrentBlock() {
-    return currentBlock;
-  }
-
-  public List<String> getBlocks() {
-    return blocks;
-  }
-
   public List<Annotation> getAnnotations() {
     return annotations;
   }
@@ -74,7 +62,7 @@ public class Canvas {
     if (!flushInline() && tag.getListBullet() != null) {
         writeUnconsumedBullet();
     }
-    currentBlock.getPrefix().registerPrefix(tag.getPadding(), tag.getListBullet());
+    currentBlock.getPrefixObj().registerPrefix(tag.getPadding(), tag.getListBullet());
 
     int requiredMargin = Math.max(tag.getPreviousMarginAfter(), tag.getMarginBefore());
     if (requiredMargin > margin) {
@@ -92,7 +80,7 @@ public class Canvas {
       if (!flushInline() && tag.getListBullet()!= null) {
         writeUnconsumedBullet();
       }
-      currentBlock.getPrefix().removeLastPrefix();
+      currentBlock.getPrefixObj().removeLastPrefix();
       closeBlock(tag);
     }
 
@@ -129,7 +117,7 @@ public class Canvas {
   }
 
   public void writeUnconsumedBullet() {
-    String bullet = currentBlock.getPrefix().getUnconsumedBullet();
+    String bullet = currentBlock.getPrefixObj().getUnconsumedBullet();
     if (bullet == null || bullet.isEmpty() ) {
       return;
     }
@@ -155,6 +143,6 @@ public class Canvas {
   }
 
   public int getLeftMargin() {
-    return currentBlock.getPrefix().getCurrent_padding();
+    return currentBlock.getPrefixObj().getCurrentPadding();
   }
 }

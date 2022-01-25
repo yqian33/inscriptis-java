@@ -4,17 +4,18 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Prefix {
-  public int current_padding = 0;
+
+  public int currentPadding = 0;
   public List<Integer> paddings = new ArrayList();
   public List<String> bullets = new ArrayList();
   public boolean consumed = false;
 
-  public int getCurrent_padding() {
-    return current_padding;
+  public int getCurrentPadding() {
+    return currentPadding;
   }
 
-  public void setCurrent_padding(int current_padding) {
-    this.current_padding = current_padding;
+  public void setCurrentPadding(int current_padding) {
+    this.currentPadding = current_padding;
   }
 
   public List<Integer> getPaddings() {
@@ -42,12 +43,12 @@ public class Prefix {
   }
 
   public void registerPrefix(int paddingInline, String bullet) {
-    current_padding += paddingInline;
+    currentPadding += paddingInline;
     paddings.add(paddingInline);
     if (bullet != null) {
       bullets.add(bullet);
     }
-    System.out.println("padding: " + current_padding);
+    System.out.println("padding: " + currentPadding);
   }
 
   public String popNextBullet() {
@@ -78,7 +79,7 @@ public class Prefix {
     if (bullet == null || bullet.isEmpty()) {
       return "";
     }
-    int padding = current_padding - paddings.get(paddings.size()-1);
+    int padding = currentPadding - paddings.get(paddings.size()-1);
     String res = StringUtils.repeat(" ", padding - bullet.length());
     return res + bullet;
   }
@@ -87,7 +88,7 @@ public class Prefix {
     int paddingSize = paddings.size();
     if (paddingSize > 0) {
       int p = paddings.get(paddingSize-1);
-      current_padding -= p;
+      currentPadding -= p;
       paddings.remove(paddingSize-1);
     }
     if (bullets.size() > 0) {
@@ -101,12 +102,12 @@ public class Prefix {
     }
     consumed = true;
     String bullet = popNextBullet();
-    String res = StringUtils.repeat(" ", current_padding - bullet.length());
+    String res = StringUtils.repeat(" ", currentPadding - bullet.length());
     return res + bullet;
   }
 
   public String rest() {
-    return StringUtils.repeat(" ", current_padding);
+    return StringUtils.repeat(" ", currentPadding);
   }
 
 }

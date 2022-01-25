@@ -15,8 +15,6 @@
  */
 package ch.x28.inscriptis;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +29,6 @@ import java.util.stream.Stream;
  */
 class Line {
 
-	private Long index;
 	private int marginBefore = 0;
 	private int marginAfter = 0;
 	private String prefix = "";
@@ -39,9 +36,6 @@ class Line {
 	private String content = "";
 	private String listBullet = "";
 	private int padding = 0;
-
-	public Line() {
-	}
 
 	public void addContent(String content) {
 		this.content += content;
@@ -178,13 +172,5 @@ class Line {
 	 */
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
-	}
-
-	public Long getIndex() {
-		return index;
-	}
-
-	public void setIndex(Long index) {
-		this.index = index;
 	}
 }
