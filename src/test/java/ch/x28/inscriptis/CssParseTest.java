@@ -66,9 +66,4 @@ public class CssParseTest {
 		assertThat(htmlElement.getMarginAfter()).isEqualTo(3);
 	}
 
-	@Test
-	public void test() {
-
-	}
-
 }

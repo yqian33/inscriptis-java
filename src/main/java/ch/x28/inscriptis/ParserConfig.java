@@ -150,10 +150,6 @@ public class ParserConfig {
 		this.displayLinks = displayLinks;
 	}
 
-	public Map<String, List<String>> getAnnotationRules() {
-		return annotationRules;
-	}
-
 	public CssProfile updateCssProfile(Map<String, List<String>> annotationRules) {
 		CssProfile cssProfile = CssProfile.RELAXED;
 		if (annotationRules != null) {
@@ -165,9 +161,5 @@ public class ParserConfig {
 
 	public String getTableCellSeparator() {
 		return tableCellSeparator;
-	}
-
-	public void setTableCellSeparator(String tableCellSeparator) {
-		this.tableCellSeparator = tableCellSeparator;
 	}
 }
