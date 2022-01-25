@@ -51,6 +51,10 @@ class Line {
 		return content;
 	}
 
+	public String getListBullet() {
+		return listBullet;
+	}
+
 	public void setContent(String content) {
 		this.content = content;
 	}
@@ -65,6 +69,14 @@ class Line {
 
 	public int getPadding() {
 		return padding;
+	}
+
+	public String getPrefix() {
+		return prefix;
+	}
+
+	public String getSuffix() {
+		return suffix;
 	}
 
 	/**
