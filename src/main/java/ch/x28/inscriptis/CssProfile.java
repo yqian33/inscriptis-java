@@ -27,7 +27,7 @@ import ch.x28.inscriptis.HtmlProperties.WhiteSpace;
  * @author Sascha Wolski
  * @author Matthias Hewelt
  */
-public class CssProfile {
+public class CssProfile implements Cloneable {
 
 	/**
 	 * This profile corresponds to the defaults used by Firefox
@@ -101,6 +101,14 @@ public class CssProfile {
 		return settings.get(tag);
 	}
 
+	public Map<String, HtmlElement> get() {
+		return settings;
+	}
+
+	public void add(String tag, HtmlElement htmlElement) {
+		settings.put(tag, htmlElement);
+	}
+
 	public HtmlElement getOrDefault(String tag, HtmlElement defaultElement) {
 
 		HtmlElement htmlElement = settings.get(tag);
@@ -109,5 +117,9 @@ public class CssProfile {
 		}
 
 		return defaultElement;
+	}
+
+	protected Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 }

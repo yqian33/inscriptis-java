@@ -41,7 +41,7 @@ class HtmlProperties {
 	}
 
 	/**
-	 * This enum specifies the vertical alignment.
+	 * This enum specifies the horizontal alignment.
 	 */
 	public enum HorizontalAlignment {
 		LEFT('<'),
@@ -51,6 +51,25 @@ class HtmlProperties {
 		private final char value;
 
 		private HorizontalAlignment(char value) {
+			this.value = value;
+		}
+
+		public char getValue() {
+			return value;
+		}
+	}
+
+	/**
+	 * This enum specifies the vertical alignment.
+	 */
+	public enum VerticalAlignment {
+		TOP('1'),
+		MIDDLE('2'),
+		BOTTOM('3');
+
+		private final char value;
+
+		private VerticalAlignment(char value) {
 			this.value = value;
 		}
 

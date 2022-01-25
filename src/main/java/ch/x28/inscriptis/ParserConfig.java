@@ -15,6 +15,12 @@
  */
 package ch.x28.inscriptis;
 
+import ch.x28.inscriptis.annotation.AnnotationModel;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * The ParserConfig object encapsulates configuration options and custom CSS definitions used by inscriptis for
  * translating HTML to text.
@@ -29,12 +35,24 @@ public class ParserConfig {
 	private boolean deduplicateCaptions = false;
 	private boolean displayLinks = false;
 	private boolean displayAnchors = false;
+	private Map<String, List<String>> annotationRules = new HashMap<>();
+	private String tableCellSeparator = "  ";
 
 	/**
 	 * Creates a new parser configuration with {@link CssProfile#RELAXED}.
 	 */
 	public ParserConfig() {
 		css = CssProfile.RELAXED;
+	}
+
+	public ParserConfig(Map<String, List<String>> annotationRules) {
+		this.annotationRules = annotationRules;
+		css = updateCssProfile(annotationRules);
+		/*
+            # attribute handler with annotation support
+            self.attribute_handler.merge_attribute_map(
+                annotation_model.css_attr)
+		 */
 	}
 
 	/**
@@ -132,4 +150,24 @@ public class ParserConfig {
 		this.displayLinks = displayLinks;
 	}
 
+	public Map<String, List<String>> getAnnotationRules() {
+		return annotationRules;
+	}
+
+	public CssProfile updateCssProfile(Map<String, List<String>> annotationRules) {
+		CssProfile cssProfile = CssProfile.RELAXED;
+		if (annotationRules != null) {
+			AnnotationModel model = new AnnotationModel(cssProfile, annotationRules);
+			return model.getCss();
+		}
+		return null;
+	}
+
+	public String getTableCellSeparator() {
+		return tableCellSeparator;
+	}
+
+	public void setTableCellSeparator(String tableCellSeparator) {
+		this.tableCellSeparator = tableCellSeparator;
+	}
 }

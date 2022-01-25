@@ -15,6 +15,8 @@
  */
 package ch.x28.inscriptis;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +31,7 @@ import java.util.stream.Stream;
  */
 class Line {
 
+	private Long index;
 	private int marginBefore = 0;
 	private int marginAfter = 0;
 	private String prefix = "";
@@ -36,6 +39,17 @@ class Line {
 	private String content = "";
 	private String listBullet = "";
 	private int padding = 0;
+	private boolean collapsableWhitespace = true;
+
+	private Prefix prefixObj;
+
+	public Line() {
+	}
+
+	public Line(Long index, Prefix prefix) {
+		this.index = index;
+		prefixObj = prefix;
+	}
 
 	public void addContent(String content) {
 		this.content += content;
@@ -67,6 +81,37 @@ class Line {
 
 	public String getSuffix() {
 		return suffix;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public boolean isCollapsableWhitespace() {
+		return collapsableWhitespace;
+	}
+
+	public void setCollapsableWhitespace(boolean collapsableWhitespace) {
+		this.collapsableWhitespace = collapsableWhitespace;
+	}
+
+	public Prefix getPrefixObj() {
+		return prefixObj;
+	}
+
+	public void setPrefixObj(Prefix prefixObj) {
+		this.prefixObj = prefixObj;
+	}
+
+	public String getContentText() {
+		if (!collapsableWhitespace) {
+			return content;
+		}
+		if (content.endsWith(" ")) {
+			content = content.substring(0, content.length()-1);
+			index -= 1;
+		}
+		return content;
 	}
 
 	/**
@@ -170,4 +215,62 @@ class Line {
 		this.suffix = suffix;
 	}
 
+	public Long getIndex() {
+		return index;
+	}
+
+	public void setIndex(Long index) {
+		this.index = index;
+	}
+
+	public Line newLine() {
+		this.prefixObj.setConsumed(false);
+		return new Line(this.index + 1, this.prefixObj);
+	}
+
+	public void merge(String text, HtmlProperties.WhiteSpace whiteSpace) {
+		if ( whiteSpace == HtmlProperties.WhiteSpace.PRE) {
+			mergePreText(text);
+		} else {
+			mergeNormalText(text);
+		}
+	}
+
+	public void mergeNormalText(String text) {
+		List<String> normalizedText = new ArrayList<>();
+		for (char ch : text.toCharArray()) {
+			if (!Character.isWhitespace(ch)) {
+				normalizedText.add(String.valueOf(ch));
+				collapsableWhitespace = false;
+			}else if (!collapsableWhitespace) {
+				normalizedText.add(" ");
+				collapsableWhitespace = true;
+			}
+		}
+
+		if (normalizedText.size() > 0) {
+			String resText = String.join("", normalizedText);
+			if (content == null || content.isEmpty()) {
+				// System.out.println("line obj:" + this.prefixObj);
+				// System.out.println("prefix consumed:" + prefixObj.consumed);
+				resText = prefixObj.first() + resText;
+			}
+			// TODO:  unescape text
+			resText = StringEscapeUtils.unescapeCsv(resText);
+			resText = StringEscapeUtils.unescapeHtml(resText);
+			content += resText;
+			index += resText.length();
+		}
+	}
+
+	public void mergePreText(String text) {
+		String ntext = text.replace("\n", "\n"+prefixObj.rest());
+		String resText = prefixObj.first() + ntext;
+		// TODO:  unescape text
+		resText = StringEscapeUtils.unescapeCsv(resText);
+		resText = StringEscapeUtils.unescapeHtml(resText);
+		content += resText;
+		index += resText.length();
+		collapsableWhitespace = false;
+	}
 }

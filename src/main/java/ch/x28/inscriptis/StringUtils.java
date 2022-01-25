@@ -5,6 +5,21 @@ import java.util.List;
 
 class StringUtils {
 
+	public static String generateStr(String fill, int size) {
+		String res = "";
+		for (int i = 0; i < size; i++) {
+			res += fill;
+		}
+		return res;
+	}
+
+	public static boolean isEmpty(String str) {
+		if (str == null || str.length() == 0) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Check if a string is null, has length zero or consists of whitespace characters only.
 	 *
@@ -207,5 +222,13 @@ class StringUtils {
 		}
 
 		return str.substring(0, index + 1);
+	}
+
+	public static List<String> repeatAsList(String str, int times) {
+		List<String> res = new ArrayList<>();
+		for (int i = 0; i < times; i++) {
+			res.add(str);
+		}
+		return res;
 	}
 }
