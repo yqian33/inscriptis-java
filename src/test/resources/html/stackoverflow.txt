@@ -1,0 +1,477 @@
+    Stack Overflow
+   1. About
+   2. Products
+   3. For Teams
+     1. Stack Overflow Public questions & answers
+     2. Stack Overflow for Teams Where developers & technologists share private knowledge with coworkers
+     3. Jobs Programming & related technical career opportunities
+     4. Talent Recruit tech talent & build your employer brand
+     5. Advertising Reach developers & technologists worldwide
+     6. About the company
+            Loading…
+   1.
+   2. Log in Sign up
+   3.
+
+          current community
+
+            +
+                Stack Overflow
+                help chat
+            +
+              Meta Stack Overflow
+
+          your communities
+
+            Sign up or log in to customize your list.
+
+          more stack exchange communities
+
+          company blog
+       1.
+              Home
+       2.
+           1. Public
+           2. Questions
+           3.
+                  Tags
+           4.
+                  Users
+           5.
+                Collectives
+           6. Explore Collectives
+           7. Find a Job
+           8.
+                  Jobs
+           9.
+                  Companies
+       3.
+                  Teams
+                  Stack Overflow for Teams – Collaborate and share knowledge with a private group. Create a free Team What is Teams?
+           1.
+                Teams
+           2.
+                  Create free Team
+          Collectives on Stack Overflow
+
+        Find centralized, trusted content and collaborate around the technologies you use most.
+
+        Learn more
+
+        Teams
+
+        Q&A for work
+
+        Connect and share knowledge within a single location that is structured and easy to search.
+
+        Learn more
+
+          Providing context in TriggerDagRunOperator
+
+            Ask Question
+            Asked 3 years, 11 months ago
+            Active 9 months ago
+            Viewed 14k times
+                    4
+                    5
+
+                  I have a dag that has been triggered by another dag. I have passed through to this dag some configuration variables via the DagRunOrder().payload dictionary in the same way the official example has done.
+
+                  Now in this dag I have another TriggerDagRunOperator to start a second dag and would like to pass those same configuration variables through.
+
+                  I have succesfully accessed the payload variables in a PythonOperator like so:
+
+                  def run_this_func(ds, **kwargs):
+                      print("Remotely received value of {} for message and {} for day".format(
+                          kwargs["dag_run"].conf["message"], kwargs["dag_run"].conf["day"])
+                      )
+
+                  run_this = PythonOperator(
+                      task_id='run_this',
+                      provide_context=True,
+                      python_callable=run_this_func,
+                      dag=dag
+                  )
+
+
+                  But the same pattern does not work in the TriggerDagRunOperator:
+
+                  def trigger(context, dag_run_obj, **kwargs):
+                      dag_run_obj.payload = {
+                          "message": kwargs["dag_run"].conf["message"],
+                          "day": kwargs["dag_run"].conf["day"]
+                      }
+                      return dag_run_obj
+
+                  trigger_step = TriggerDagRunOperator(
+                      task_id="trigger_modelling",
+                      trigger_dag_id="Dummy_Modelling",
+                      provide_context=True,
+                      python_callable=trigger,
+                      dag=dag
+                  )
+
+
+                  It yields a warning regarding the use of provide_context:
+
+                  INFO - Subtask: /usr/local/lib/python2.7/dist-packages/airflow/models.py:1927: PendingDeprecationWarning: Invalid arguments were passed to TriggerDagRunOperator. Support for passing such arguments will be dropped in Airflow 2.0. Invalid arguments were:
+                  INFO - Subtask: *args: ()
+                  INFO - Subtask: **kwargs: {'provide_context': True}
+                  INFO - Subtask:   category=PendingDeprecationWarning
+
+
+                  And this error suggesting I haven't passed the conf :
+
+                  INFO - Subtask: Traceback (most recent call last):
+                  INFO - Subtask:   File "/usr/local/lib/python2.7/dist-packages/airflow/models.py", line 1374, in run
+                  INFO - Subtask:     result = task_copy.execute(context=context)
+                  INFO - Subtask:   File "/usr/local/lib/python2.7/dist-packages/airflow/operators/dagrun_operator.py", line 64, in execute
+                  INFO - Subtask:     dro = self.python_callable(context, dro)
+                  INFO - Subtask:   File "/home/user/airflow/dags/dummy_responses.py", line 28, in trigger
+                  INFO - Subtask:     "message": kwargs["dag_run"].conf["message"],
+                  INFO - Subtask: KeyError: 'dag_run'
+
+
+                  A second pattern that I've tried which also hasn't worked is using the params argument like so:
+
+                  def trigger(context, dag_run_obj):
+                      dag_run_obj.payload = {
+                          "message": context['params']['message'],
+                          "day": context['params']['day']
+                      }
+                      return dag_run_obj
+
+                  trigger_step = TriggerDagRunOperator(
+                      task_id="trigger_modelling",
+                      trigger_dag_id="Dummy_Modelling",
+                      python_callable=trigger,
+                      params={
+                          "message": "{{ dag_run.conf['message'] }}",
+                          "day": "{{ dag_run.conf['day'] }}"
+                      },
+                      dag=dag
+                  )
+
+
+                  This pattern does not yield an error but instead passes the parameters through to the next dag as strings ie it doesn't evaluate the expressions.
+
+                  How can I access the configuration variables in the TriggerDagRunOperator of the second dag?
+
+                      python airflow
+                            Share
+                            Follow
+                          edited Feb 12 '18 at 12:39
+                          efbbrown
+                          asked Feb 12 '18 at 12:31
+                          efbbrown efbbrown
+                            3,373 5 5 gold badges 28 28 silver badges 46 46 bronze badges
+                  Add a comment  | 
+
+                  3 Answers
+
+                    Active Oldest Votes
+                      7
+
+                    Solved:
+
+                    The dag_run object is stored in the context and so the configuration variables can be accessed in the python_callable of the TriggerDagRunOperator with this pattern:
+
+                    def trigger(context, dag_run_obj):
+                        dag_run_obj.payload = {
+                            "message": context["dag_run"].conf["message"],
+                            "day": context["dag_run"].conf["day"]
+                        }
+                        return dag_run_obj
+
+                    trigger_step = TriggerDagRunOperator(
+                        task_id="trigger_modelling",
+                        trigger_dag_id="Dummy_Modelling",
+                        python_callable=trigger,
+                        dag=dag
+                    )
+
+                              Share
+                              Follow
+                            answered Feb 12 '18 at 14:05
+                            efbbrown efbbrown
+                              3,373 5 5 gold badges 28 28 silver badges 46 46 bronze badges
+                6
+                      *
+                            1
+                            How did you end up reading the passed parameters in the triggered DAG? I need to do the same, and while I can confirm the parameter I want to pass is part of the dag run object's payload, I can't seem to "read" it in the triggered DAG.
+                              – CodingInCircles
+                            Jun 19 '18 at 19:51
+                      *
+                            2
+                            I could access the parameters in my triggered dag with "{{ dag_run.conf['message'] }}" and "{{ dag_run.conf['day'] }}" . This relies on the fields in the operator through which you are trying to read the parameters being template_fields. If the "{{ dag_run.conf['day'] }}" pattern doesn't work for you because the fields aren't template_fields, you will be able to extend the operator class which you are using to make those fields template_fields. Let me know if this doesn't make sense and I will include it in my answer.
+                              – efbbrown
+                            Jun 19 '18 at 21:52
+                      *
+                            Hmmm.. I generate a file in the first DAG, and then read the file and dynamically generate tasks based on the data in the file, in the triggered DAG. Currently, I have no good way of "sending" the filename to the DAG. I can make it part of the payload, but can't assign it to a variable in the triggered DAG. I had already tried the methods in the examples and the ones you've used too.
+                              – CodingInCircles
+                            Jun 20 '18 at 18:06
+                      *
+                            I programatically create the filename in the first DAG and then use the same logic in the triggered DAG to read it. It is dangerous and error-prone and all that, but till I can figure out a way to pass the filename to the triggered DAG, I have no option, it seems.
+                              – CodingInCircles
+                            Jun 20 '18 at 18:07
+                      *
+                            2
+                            @efbbrown this solution is not working in Airflow v2.0.1; i'm getting this error: Invalid arguments were passed to TriggerDagRunOperator . Do you know how we could be passing context in TriggerDagRunOperator in Airflow version 2?
+                              – Malgi
+                            Apr 6 '21 at 0:53
+                     |  Show 1 more comment
+                      4
+
+                    In Airflow2.0.x, the equivalent of @efbbrown's answer is:
+
+                    from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+
+                    trigger_step = TriggerDagRunOperator(
+                        task_id="trigger_modelling",
+                        trigger_dag_id="Dummy_Modelling",
+                        conf={"message": "{{ dag_run.conf['message'] }}", "day":"{{
+                        dag_run.conf['day'] }}"},
+                        dag=dag
+                    )
+
+
+                    The pull request is described here on GitHub.
+
+                    See the documentation for external-triggers and for trigger_dagrun.
+
+                    Here is a YouTube video on the topic that shows the correct imports.
+
+                              Share
+                              Follow
+                            edited Apr 28 '21 at 15:06
+                            Lucan
+                              2,398 2 2 gold badges 9 9 silver badges 26 26 bronze badges
+                            answered Apr 25 '21 at 14:36
+                            taari taari
+                              726 6 6 silver badges 7 7 bronze badges
+                4
+                      *
+                            1
+                            Thankyou @Sawan Vaidya
+                              – efbbrown
+                            Apr 26 '21 at 9:50
+                      *
+                            Hi, Is it not possible to create the dag_run_obj payload or the conf parameter dynamically? When triggering the TriggerDagRunOperator? This used to be possible before the python_callable parameter was depreciated in Airflow 2.0.
+                              – mathee
+                            Jun 11 '21 at 11:41
+                      *
+                            @mathee, Yes, it appears that you can't do that using TriggerDagRunOperator. I solved that by adding an extra PythonOperator right before I called the TriggerDagRunOperator and I set up the dag_run_obj there
+                              – taari
+                            Jun 12 '21 at 3:24
+                      *
+                            @taari, I tried setting the dag_run_obj in python operator it didn't worked for me can share the snippet.
+                              – raman
+                            Sep 9 '21 at 10:19
+                    Add a comment  | 
+                      0
+
+                    @efbbrown Yes either you can do that or whenever you access first dags params push it to xcom and pull it while triggering second dag
+
+                              Share
+                              Follow
+                            answered Sep 7 '19 at 6:30
+                            Adarsh Adarsh
+                              21 3 3 bronze badges
+                1
+                      *
+                            7
+                            Hi, welcome to Stackoverflow, can you add some code sample such that it makes it easier to understand.
+                              – Sammy J
+                            Sep 7 '19 at 7:20
+                    Add a comment  | 
+
+            Your Answer
+
+                Thanks for contributing an answer to Stack Overflow!
+
+                  * Please be sure to answer the question. Provide details and share your research!
+
+                But avoid …
+
+                  * Asking for help, clarification, or responding to other answers.
+                  * Making statements based on opinion; back them up with references or personal experience.
+
+                To learn more, see our tips on writing great answers.
+
+                    Sign up or log in
+
+                      Sign up using Google
+                      Sign up using Facebook
+                      Sign up using Email and Password
+                  Submit
+
+                    Post as a guest
+
+                        Name
+                            Email
+
+                            Required, but never shown
+
+              Post as a guest
+
+                  Name
+                      Email
+
+                      Required, but never shown
+
+              Post Your Answer Discard
+
+              By clicking “Post Your Answer”, you agree to our terms of service, privacy policy and cookie policy
+
+            Not the answer you're looking for? Browse other questions tagged python airflow or ask your own question.
+
+                  The Overflow Blog
+              *
+                  How to defend your attention and find a flow state
+              *
+                  Keeping technologists in the flow state
+                  Featured on Meta
+              *
+                  We’ve made changes to our Terms of Service & Privacy Policy - January 2022
+              *
+                  New post summary designs on site home pages and greatest hits now; everywhere...
+              *
+                  Sunsetting Jobs & Developer Story
+
+            Linked
+
+                  4
+                Can I use a TriggerDagRunOperator to pass a parameter to the triggered dag? Airflow
+
+            Related
+
+                  0
+                Airflow jdbc unable to find class driver
+                  3
+                Airflow integration with BgQuery Error
+                  2
+                "Invalid arguments passed" error for dag that loads mysql data to bigquery using airflow
+                  8
+                Airflow deprecation warning Invalid arguments were passed
+                  4
+                Apache Airflow - How to set execution_date using TriggerDagRunOperator in target DAG for use the current execution_date
+                  0
+                Call stored procedure airflow using Oracleoperator
+                  1
+                How to trigger Glue Job using AWS GlueOperator
+                  0
+                Airflow PythonOperator task fail - TypeError: The key has to be a string
+
+            Hot Network Questions
+
+              *
+                Wasabi In Sushi Go
+              *
+                Are slander and defamation the same thing?
+              *
+                How to harmonize ^3 ^2 ^1 in minor while tonicing III
+              *
+                Did Getafix ever drink the magic potion himself?
+              *
+                Sort every dimension
+              *
+                What went wrong with my walnut brittle
+              *
+                Select values that are the same in another column in another layer
+              *
+                Count the ways to transform
+              *
+                Will c-lightning's `withdraw destination all` take anything from the channel funds?
+              *
+                Radiation poisoning and primitive peoples
+              *
+                What should be the exact nature of these brain symbiotes?
+              *
+                Is Linear Programming as Useful as it was 50 Years Ago?
+              *
+                I accidentally deleted /usr/bin/test and now I can't update, upgrade and install packages
+              *
+                USA to Canada after 90 days without re-entering it
+              *
+                What is a post-installation script for a package?
+              *
+                Has any piston machine been used on a space mission?
+              *
+                Group numeric vector by predefined maximal group sum
+              *
+                History of the (Famous) Simplex Algorithm?
+              *
+                Is every Pantone color displayable in sRGB?
+              *
+                What is the name of this 5-pin connector?
+              *
+                Geothermal instead of fossil and nuclear?
+              *
+                Probability breaking sequences
+              *
+                Scam? Does having this capacitor wired as shown provide any surge protection?
+              *
+                My PhD supervisor is starting a formal procedure to remove himself as my supervisor
+            more hot questions
+            Question feed
+
+            Subscribe to RSS
+
+                Question feed
+
+                To subscribe to this RSS feed, copy and paste this URL into your RSS reader.
+
+    Stack Overflow
+
+      * Questions
+      * Jobs
+      * Developer Jobs Directory
+      * Salary Calculator
+      * Help
+      * Mobile
+
+    Products
+
+      * Teams
+      * Talent
+      * Advertising
+      * Enterprise
+
+    Company
+
+      * About
+      * Press
+      * Work Here
+      * Legal
+      * Privacy Policy
+      * Terms of Service
+      * Contact Us
+      * Cookie Settings
+      * Cookie Policy
+
+      Stack Exchange Network
+
+        * Technology
+        * Culture & recreation
+        * Life & arts
+        * Science
+        * Professional
+        * Business
+        * API
+        * Data
+      * Blog
+      * Facebook
+      * Twitter
+      * LinkedIn
+      * Instagram
+
+    site design / logo © 2022 Stack Exchange Inc; user contributions licensed under cc by-sa. rev 2022.1.26.41266
+
+  Stack Overflow works best with JavaScript enabled
+
+  Your privacy
+
+  By clicking “Accept all cookies”, you agree Stack Exchange can store cookies on your device and disclose information in accordance with our Cookie Policy.
+
+    Accept all cookies Customize settings
+   
