@@ -45,10 +45,10 @@ public class Prefix {
   public void registerPrefix(int paddingInline, String bullet) {
     currentPadding += paddingInline;
     paddings.add(paddingInline);
+
     if (bullet != null) {
       bullets.add(bullet);
     }
-    System.out.println("padding: " + currentPadding);
   }
 
   public String popNextBullet() {
@@ -60,14 +60,12 @@ public class Prefix {
       next_bullet_idx = bullets.size() - i;
     }
     next_bullet_idx -= 1;
-    System.out.println("bullets: " + bullets + " " + next_bullet_idx);
 
     if (next_bullet_idx == 0) {
       return "";
     }
     String bullet = bullets.get(next_bullet_idx);
     bullets.set(next_bullet_idx, "");
-    System.out.println("now bullets: " + bullets);
     return bullet;
   }
 

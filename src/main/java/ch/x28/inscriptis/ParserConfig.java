@@ -16,6 +16,9 @@
 package ch.x28.inscriptis;
 
 import ch.x28.inscriptis.annotation.AnnotationModel;
+import ch.x28.inscriptis.annotation.AttributesHandler;
+import ch.x28.inscriptis.parsers.AlignParser;
+import ch.x28.inscriptis.parsers.ValignParser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +38,8 @@ public class ParserConfig {
 	private boolean deduplicateCaptions = false;
 	private boolean displayLinks = false;
 	private boolean displayAnchors = false;
-	private Map<String, List<String>> annotationRules = new HashMap<>();
 	private String tableCellSeparator = "  ";
+	private AttributesHandler attributesHandler = new AttributesHandler();
 
 	/**
 	 * Creates a new parser configuration with {@link CssProfile#RELAXED}.
@@ -46,13 +49,9 @@ public class ParserConfig {
 	}
 
 	public ParserConfig(Map<String, List<String>> annotationRules) {
-		this.annotationRules = annotationRules;
+		attributesHandler.addToAttributesMap("align", new AlignParser());
+		attributesHandler.addToAttributesMap("valign", new ValignParser());
 		css = updateCssProfile(annotationRules);
-		/*
-            # attribute handler with annotation support
-            self.attribute_handler.merge_attribute_map(
-                annotation_model.css_attr)
-		 */
 	}
 
 	/**
@@ -154,6 +153,7 @@ public class ParserConfig {
 		CssProfile cssProfile = CssProfile.RELAXED;
 		if (annotationRules != null) {
 			AnnotationModel model = new AnnotationModel(cssProfile, annotationRules);
+			attributesHandler.mergeAttributesMap(model.getCssAttr());
 			return model.getCss();
 		}
 		return null;
@@ -161,5 +161,9 @@ public class ParserConfig {
 
 	public String getTableCellSeparator() {
 		return tableCellSeparator;
+	}
+
+	public AttributesHandler getAttributesHandler() {
+		return attributesHandler;
 	}
 }

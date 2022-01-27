@@ -28,7 +28,7 @@ public class TableCellCanvas extends Canvas {
 
 
   public Integer getWidth() {
-    if (this.width != null) {
+    if (this.width != null && this.width > 0) {
       return this.width;
     }
     List<Integer> linesSize = getLines().stream().map(String::length).collect(Collectors.toList());

@@ -160,17 +160,23 @@ class Table {
 	}
 
 	public void setColumnWidth() {
+		if (rows.isEmpty()) {
+			return;
+		}
+
 		int maxCols = Collections.max(
-				rows.stream().map(Row::getColumns).map(List::size)
-						.collect(Collectors.toList()));
-		for(int i = 0; i < maxCols; i++) {
+					rows.stream().map(Row::getColumns).map(List::size)
+							.collect(Collectors.toList()));
+		for (int i = 0; i < maxCols; i++) {
 			int maxColumnWidth = computeColumnWidth(i);
-			for (Row row: rows) {
+			for (Row row : rows) {
 				if (row.getCellColumns().size() > i) {
-					row.getCellColumns().get(i).setWidth(maxColumnWidth);
+					row.getCellColumns().get(i)
+							.setWidth(maxColumnWidth);
 				}
 			}
 		}
+
 
 
 	}

@@ -14,7 +14,7 @@ public class Block extends Line {
   private Prefix prefixObj;
 
   public Block(Long index, Prefix prefix) {
-    this.setIndex(index);
+    this.index = index;
     this.prefixObj = prefix;
   }
 
@@ -24,7 +24,7 @@ public class Block extends Line {
 
   public Block newBlock() {
     this.prefixObj.setConsumed(false);
-    return new Block(this.getIndex()+1, this.prefixObj);
+    return new Block(index + 1, this.prefixObj);
   }
 
   @Override
@@ -35,7 +35,7 @@ public class Block extends Line {
     if (getContent().endsWith(" ")) {
       String content = getContent().substring(0, getContent().length()-1);
       setContent(content);
-      setIndex(getIndex()-1);
+      index -= 1;
     }
     return getContent();
   }
@@ -65,7 +65,6 @@ public class Block extends Line {
       if (getContent() == null || getContent().isEmpty()) {
         resText = prefixObj.first() + resText;
       }
-      // TODO:  unescape text
       resText = StringEscapeUtils.unescapeCsv(resText);
       resText = StringEscapeUtils.unescapeHtml(resText);
       addContent(resText);
@@ -75,8 +74,8 @@ public class Block extends Line {
 
   public void mergePreText(String text) {
     String ntext = text.replace("\n", "\n"+ prefixObj.rest());
-    String resText = prefixObj.first() + ntext;
-    // TODO:  unescape text
+    String prefixFirst = prefixObj.first();
+    String resText = prefixFirst + ntext;
     resText = StringEscapeUtils.unescapeCsv(resText);
     resText = StringEscapeUtils.unescapeHtml(resText);
     addContent(resText);

@@ -6,19 +6,21 @@ import ch.x28.inscriptis.HtmlElement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class AnnotationModel {
 
-  private List<AnnotationHandler> cssAttr = new ArrayList<>();
+  private List<AnnotationParser> cssAttr = new ArrayList<>();
   private CssProfile css;
 
-  public List<AnnotationHandler> getCssAttr() {
+  public List<AnnotationParser> getCssAttr() {
     return cssAttr;
   }
 
-  public void setCssAttr(List<AnnotationHandler> cssAttr) {
+  public void setCssAttr(List<AnnotationParser> cssAttr) {
     this.cssAttr = cssAttr;
   }
 
@@ -39,14 +41,14 @@ public class AnnotationModel {
       if (cssProfile.get(tag) == null) {
         cssProfile.add(tag, new HtmlElement());
       }
-      List<String> updatedAnnotations = cssProfile.get(tag).getAnnotation();
+      Set<String> updatedAnnotations = cssProfile.get(tag).getAnnotation();
       if (updatedAnnotations == null) {
-        updatedAnnotations = new ArrayList<>();
+        updatedAnnotations = new HashSet<>();
       }
       updatedAnnotations.addAll(annotations);
       cssProfile.get(tag).setAnnotation(updatedAnnotations);
-      this.css = cssProfile;
     }
+    this.css = cssProfile;
 
   }
 
@@ -64,14 +66,12 @@ public class AnnotationModel {
         String tag = tagAttr.get(0);
         String attr = tagAttr.get(1);
         String value = null;
-
         if (attr.contains("=")) {
-          List<String> attrValue =  Arrays.asList(key.split("="));
+          List<String> attrValue =  Arrays.asList(attr.split("="));
           attr = attrValue.get(0);
           value = attrValue.get(1);
         }
-
-        cssAttr.add(new AnnotationHandler(annotations, attr, tag, value));
+        cssAttr.add(new AnnotationParser(annotations, attr, tag, value));
 
       } else {
         tagToAnnotations.computeIfAbsent(key, k -> new ArrayList<>())

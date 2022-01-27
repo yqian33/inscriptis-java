@@ -19,7 +19,7 @@ package ch.x28.inscriptis;
  * @author Sascha Wolski
  * @author Matthias Hewelt
  */
-class HtmlProperties {
+public class HtmlProperties {
 
 	/**
 	 * This enum specifies whether content will be rendered as inline, block or none (i.e. not rendered).

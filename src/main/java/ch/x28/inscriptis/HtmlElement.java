@@ -18,7 +18,8 @@ package ch.x28.inscriptis;
 import ch.x28.inscriptis.HtmlProperties.Display;
 import ch.x28.inscriptis.HtmlProperties.WhiteSpace;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The HtmlElement class stores the CSS properties.
@@ -74,19 +75,27 @@ public class HtmlElement {
 	 */
 	private String listBullet = "";
 
-	private List<String> annotation;
+	private Set<String> annotation;
 
 	private Canvas canvas;
 
 	private HtmlProperties.HorizontalAlignment align  = HtmlProperties.HorizontalAlignment.LEFT;
-	private HtmlProperties.VerticalAlignment valign  = HtmlProperties.VerticalAlignment.MIDDLE;
+	private HtmlProperties.VerticalAlignment valign  = HtmlProperties.VerticalAlignment.TOP;
 
 	public HtmlProperties.HorizontalAlignment getAlign() {
 		return align;
 	}
 
+	public void setAlign(HtmlProperties.HorizontalAlignment align) {
+		this.align = align;
+	}
+
 	public HtmlProperties.VerticalAlignment getValign() {
 		return valign;
+	}
+
+	public void setValign(HtmlProperties.VerticalAlignment valign) {
+		this.valign = valign;
 	}
 
 	public String getListBullet() {
@@ -97,11 +106,11 @@ public class HtmlElement {
 		this.listBullet = listBullet;
 	}
 
-	public List<String> getAnnotation() {
+	public Set<String> getAnnotation() {
 		return annotation;
 	}
 
-	public void setAnnotation(List<String> annotation) {
+	public void setAnnotation(Set<String> annotation) {
 		this.annotation = annotation;
 	}
 
@@ -175,7 +184,7 @@ public class HtmlElement {
 		boolean limitWhitespaceAffixes,
 		Canvas canvas,
 		int previousMarginAfter,
-	        List<String> annotation) {
+	        Set<String> annotation) {
 
 		this.tag = tag;
 		this.prefix = prefix;
@@ -244,6 +253,10 @@ public class HtmlElement {
 		return prefix;
 	}
 
+	public void setLimitWhitespaceAffixes(boolean isLimitWhitespaceAffixes) {
+		this.limitWhitespaceAffixes = isLimitWhitespaceAffixes;
+	}
+
 	/**
 	 * @param htmlElement the new HtmlElement to be applied to the current context.
 	 * @return the refined element with the context applied.
@@ -290,15 +303,17 @@ public class HtmlElement {
 				htmlElement.getMarginBefore(),
 				htmlElement.getMarginAfter(),
 				htmlElement.getPadding(),
-				false,
+				htmlElement.isLimitWhitespaceAffixes(),
 				canvas,
 				previousMarginAfter,
 				htmlElement.getAnnotation());
+
 	}
 
 	public String getSuffix() {
 		return suffix;
 	}
+
 
 	public String getTag() {
 		return tag;
@@ -314,10 +329,6 @@ public class HtmlElement {
 
 	public void setDisplay(Display display) {
 		this.display = display;
-	}
-
-	public void setLimitWhitespaceAffixes(boolean limitWhitespaceAffixes) {
-		this.limitWhitespaceAffixes = limitWhitespaceAffixes;
 	}
 
 	public void setMarginAfter(int marginAfter) {
@@ -349,9 +360,13 @@ public class HtmlElement {
 		this.whitespace = whitespace;
 	}
 
+	public void setPreviousMarginAfter(int m) {
+		this.previousMarginAfter = m;
+	}
+
 	@Override
 	public String toString() {
-		return "HtmlElement [tag=" + tag +
+		return "HtmlElement[tag=" + tag +
 			", display=" + display +
 			", whitespace=" + whitespace +
 			", prefix=" + prefix +
@@ -379,11 +394,11 @@ public class HtmlElement {
 		if (display == Display.BLOCK) {
 			canvas.openBlock(this);
 		}
+
 		canvas.write(this, text, WhiteSpace.PRE);
 
 		if (display == Display.BLOCK) {
 			canvas.closeBlock(this);
 		}
 	}
-
 }

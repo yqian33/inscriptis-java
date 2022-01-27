@@ -36,6 +36,17 @@ public class Canvas {
     return annotations;
   }
 
+  public List<String> getBlocks() {
+    return blocks;
+  }
+
+  public List<String> addBlock(String content) {
+    // System.out.println("Add block: " + content + ":" + this.blocks);
+    this.blocks.add(content);
+    // System.out.println("Added block " + this.blocks);
+    return blocks;
+  }
+
   @Override
   public String toString() {
     return "Canvas[margin=" + margin +
@@ -68,10 +79,10 @@ public class Canvas {
     if (requiredMargin > margin) {
       Long requiredNewlines = requiredMargin - margin;
       currentBlock.setIndex(currentBlock.getIndex() + requiredNewlines);
-      blocks.add(StringUtils.generateStr("\n", requiredNewlines.intValue()-1));
+      String newLines = StringUtils.repeat("\n", requiredNewlines.intValue()-1);
+      addBlock(newLines);
       margin = (long) requiredMargin;
     }
-
   }
 
 
@@ -100,15 +111,15 @@ public class Canvas {
     if (tag.getMarginAfter() > margin) {
       Long requiredNewlines = tag.getMarginAfter() - margin;
       currentBlock.setIndex(currentBlock.getIndex() + requiredNewlines);
-      blocks.add(StringUtils.generateStr("\n", requiredNewlines.intValue()-1));
+      addBlock(StringUtils.repeat("\n", requiredNewlines.intValue()-1));
       margin = (long) tag.getMarginAfter();
     }
   }
 
   public boolean flushInline() {
-    System.out.println("current block: "+ currentBlock.getText());
-    if (!StringUtils.isEmpty(currentBlock.getText())) {
-      blocks.add(currentBlock.getText());
+    String currentContent = currentBlock.getText();
+    if (!StringUtils.isEmpty(currentContent)) {
+      addBlock(currentContent);
       currentBlock = currentBlock.newBlock();
       margin = 0L;
       return true;
@@ -121,7 +132,7 @@ public class Canvas {
     if (bullet == null || bullet.isEmpty() ) {
       return;
     }
-    blocks.add(bullet);
+    addBlock(bullet);
     currentBlock.setIndex(currentBlock.getIndex() + bullet.length());
     currentBlock = currentBlock.newBlock();
     margin = 0L;
@@ -137,7 +148,7 @@ public class Canvas {
 
   public void writeNewLine() {
     if (!flushInline()) {
-      blocks.add("");
+      addBlock("");
       currentBlock = currentBlock.newBlock();
     }
   }

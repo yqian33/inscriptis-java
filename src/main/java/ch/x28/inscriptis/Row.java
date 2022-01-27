@@ -30,10 +30,6 @@ class Row {
 	private final List<TableCellCanvas> cellColumns = new ArrayList<>();
 	private String cellSeparator;
 
-	public String getCellSeparator() {
-		return cellSeparator;
-	}
-
 	public Row setCellSeparator(String cellSeparator) {
 		this.cellSeparator = cellSeparator;
 		return this;
@@ -113,12 +109,15 @@ class Row {
 
 		List<List<String>> lines = new ArrayList<>();
 		int minLen = Integer.MAX_VALUE;
-
-		for (TableCellCanvas column : cellColumns) {
-			lines.add(column.blocks);
-			if (column.blocks.size() < minLen) {
-				minLen = column.blocks.size();
+                if (cellColumns.size() > 0) {
+			for (TableCellCanvas column : cellColumns) {
+				lines.add(column.blocks);
+				if (column.blocks.size() < minLen) {
+					minLen = column.blocks.size();
+				}
 			}
+		} else {
+			minLen = 0;
 		}
 
 		List<String> rowLines = new ArrayList<>();
@@ -131,7 +130,11 @@ class Row {
 			rowLines.add(rowLine);
 		}
 
-		return String.join("\n", rowLines);
+		String result = "";
+		if (rowLines.size() > 0) {
+			result = String.join("\n", rowLines);
+		}
+		return result;
 	}
 
 	public int getWidth() {
@@ -142,5 +145,13 @@ class Row {
 		List<Integer> a = cellColumns.stream().map(TableCellCanvas::getWidth).collect(Collectors.toList());
 		int s = a.stream().mapToInt(Integer::intValue).sum();
 		return s + cellSeparator.length() * (cellColumns.size() - 1);
+	}
+
+	public List<List<String>> getBlocks() {
+		List<List<String>> res = new ArrayList<>();
+		for (TableCellCanvas cell: cellColumns) {
+			res.add(cell.blocks);
+		}
+		return res;
 	}
 }

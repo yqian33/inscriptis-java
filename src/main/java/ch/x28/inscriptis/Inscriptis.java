@@ -16,10 +16,13 @@
 package ch.x28.inscriptis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -135,9 +138,11 @@ public class Inscriptis {
 	}
 
 	public String getAnnotatedText() {
-		System.out.println("all blocks: " + canvas.blocks);
-		System.out.println("annotation: " + canvas.getAnnotations());
-		return canvas.getText();
+		return StringUtils.stripTrailing(canvas.getText());
+	}
+
+	public List<Canvas.Annotation> getAnnotations() {
+		return canvas.getAnnotations();
 	}
 
 	private void endA() {
@@ -155,7 +160,6 @@ public class Inscriptis {
 	}
 
 	private void endTable() {
-
 		if (!currentTable.isEmpty() && currentTable.peek().isTdOpen()) {
 			endTd();
 		}
@@ -167,7 +171,7 @@ public class Inscriptis {
 
 		String outOfTableText = currentTag.peek().getCanvas().getText();
 		HtmlElement preTag = currentTag.elementAt(currentTag.size()-2);
-		if (outOfTableText != null) {
+		if (!StringUtils.isEmpty(outOfTableText)) {
 			preTag.write(outOfTableText);
 			preTag.getCanvas().writeNewLine();
 		}
@@ -189,10 +193,8 @@ public class Inscriptis {
 	}
 
 	private void endTd() {
-		if (!currentTable.isEmpty()) {
-			currentTag.peek().getCanvas().closeTag(currentTag.peek());
-		}
 		if (!currentTable.isEmpty() && currentTable.peek().isTdOpen()) {
+			currentTag.peek().getCanvas().closeTag(currentTag.peek());
 			currentTable.peek().setTdOpen(false);
 			writeLine(true);
 			cleanTextLines.pop();
@@ -246,7 +248,6 @@ public class Inscriptis {
 	 * @param node the HTML end tag to process.
 	 */
 	private void handleEndTag(Node node) {
-		System.out.println("end node: " + node.getNodeName());
 
 		HtmlElement curTag = currentTag.peek(); // pop from outside of handleEndTag
 		nextLine.peek().setPadding(currentLine.peek().getPadding() - curTag.getPadding());
@@ -290,8 +291,11 @@ public class Inscriptis {
 		NamedNodeMap attrs = node.getAttributes();
 
 		// use the css to handle tags known to it
-		HtmlElement curTag = currentTag.peek().getRefinedHtmlElement(
-			config.getCss().getOrDefault(tag, Inscriptis.DEFAULT_ELEMENT).setTag(tag));
+		HtmlElement baseElement = config.getCss().getOrDefault(tag, Inscriptis.DEFAULT_ELEMENT)
+				.clone()
+				.setTag(tag);
+		HtmlElement e = config.getAttributesHandler().applyHandlers(attrs, baseElement);
+		HtmlElement curTag = currentTag.peek().getRefinedHtmlElement(e);
 
 		Node attrStyle = attrs.getNamedItem("style");
 		if (attrStyle != null) {
