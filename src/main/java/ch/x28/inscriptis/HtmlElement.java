@@ -83,47 +83,6 @@ public class HtmlElement {
 
 	private HtmlProperties.VerticalAlignment valign  = HtmlProperties.VerticalAlignment.TOP;
 
-	public HtmlProperties.HorizontalAlignment getAlign() {
-		return align;
-	}
-
-	public void setAlign(HtmlProperties.HorizontalAlignment align) {
-		this.align = align;
-	}
-
-	public HtmlProperties.VerticalAlignment getValign() {
-		return valign;
-	}
-
-	public void setValign(HtmlProperties.VerticalAlignment valign) {
-		this.valign = valign;
-	}
-
-	public String getListBullet() {
-		return listBullet;
-	}
-
-	public void setListBullet(String listBullet) {
-		this.listBullet = listBullet;
-	}
-
-	public Set<String> getAnnotation() {
-		return annotation;
-	}
-
-	public void setAnnotation(Set<String> annotation) {
-		this.annotation = annotation;
-	}
-
-	public Canvas getCanvas() {
-		return canvas;
-	}
-
-	public HtmlElement setCanvas(Canvas canvas) {
-		this.canvas = canvas;
-		return this;
-	}
-
 	public HtmlElement() {
 	}
 
@@ -229,7 +188,6 @@ public class HtmlElement {
 				annotation);
 	}
 
-
 	public Display getDisplay() {
 		return display;
 	}
@@ -252,6 +210,47 @@ public class HtmlElement {
 
 	public String getPrefix() {
 		return prefix;
+	}
+
+	public HtmlProperties.HorizontalAlignment getAlign() {
+		return align;
+	}
+
+	public void setAlign(HtmlProperties.HorizontalAlignment align) {
+		this.align = align;
+	}
+
+	public HtmlProperties.VerticalAlignment getValign() {
+		return valign;
+	}
+
+	public void setValign(HtmlProperties.VerticalAlignment valign) {
+		this.valign = valign;
+	}
+
+	public String getListBullet() {
+		return listBullet;
+	}
+
+	public void setListBullet(String listBullet) {
+		this.listBullet = listBullet;
+	}
+
+	public Set<String> getAnnotation() {
+		return annotation;
+	}
+
+	public void setAnnotation(Set<String> annotation) {
+		this.annotation = annotation;
+	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	public HtmlElement setCanvas(Canvas canvas) {
+		this.canvas = canvas;
+		return this;
 	}
 
 	public void setLimitWhitespaceAffixes(boolean isLimitWhitespaceAffixes) {
@@ -314,7 +313,6 @@ public class HtmlElement {
 	public String getSuffix() {
 		return suffix;
 	}
-
 
 	public String getTag() {
 		return tag;

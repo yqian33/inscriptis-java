@@ -150,9 +150,10 @@ class Table {
 						row.getCellColumns().stream()
 								.map(TableCellCanvas::getNormalizedBlocks)
 								.collect(Collectors.toSet()));
-			}
-			for(TableCellCanvas cellCanvas: row.getCellColumns()) {
-				cellCanvas.setHeight(maxRowHeight);
+
+				for (TableCellCanvas cellCanvas : row.getCellColumns()) {
+					cellCanvas.setHeight(maxRowHeight);
+				}
 			}
 
 		}
@@ -192,14 +193,14 @@ class Table {
 		return maxColumnWidth;
 	}
 
-	public String getContentText() {
+	public String getCanvasText() {
 		setRowHeight();
 		setColumnWidth();
-		List<String> rowTexts = rows.stream().map(Row::getContentText).collect(Collectors.toList());
+		List<String> rowTexts = rows.stream().map(Row::getCanvasText).collect(Collectors.toList());
 		return String.join("\n", rowTexts) + "\n";
 	}
 
-	public List<Canvas.Annotation> getAnnotations(int index, int leftMarginLen) {
+	List<Canvas.Annotation> getAnnotations(int index, int leftMarginLen) {
 		if (rows.isEmpty()) {
 			return new ArrayList<>();
 		}
