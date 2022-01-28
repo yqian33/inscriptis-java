@@ -3,7 +3,14 @@ package ch.x28.inscriptis;
 import java.util.ArrayList;
 import java.util.List;
 
-class StringUtils {
+public class StringUtils {
+
+	public static boolean isEmpty(String str) {
+		if (str == null || str.length() == 0) {
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Check if a string is null, has length zero or consists of whitespace characters only.
@@ -142,7 +149,7 @@ class StringUtils {
 	 * </p>
 	 *
 	 * @param str the string to be split.
-	 * @param c the separator char.
+	 * @param separator the separator char.
 	 * @param maxSplits the max amount of splits being performed.
 	 * @return a string array containing the splits. Returns null if the provided string is null. Returns a string array
 	 *         with the original string as element when the separator is not found or the number of max splits is lower
@@ -207,5 +214,23 @@ class StringUtils {
 		}
 
 		return str.substring(0, index + 1);
+	}
+
+	public static <T> List<T> repeatAsList(T str, int times) {
+		List<T> res = new ArrayList<>();
+		for (int i = 0; i < times; i++) {
+			res.add(str);
+		}
+		return res;
+	}
+
+	public static List<Integer> accumulate(List<Integer> list) {
+		List<Integer> result = new ArrayList<>();
+		int current = 0;
+		for(Integer i: list) {
+			current += i;
+			result.add(current);
+		}
+		return result;
 	}
 }

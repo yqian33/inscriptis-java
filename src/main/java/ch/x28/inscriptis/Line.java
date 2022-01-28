@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * @author Sascha Wolski
  * @author Matthias Hewelt
  */
-class Line {
+public class Line {
 
 	private int marginBefore = 0;
 	private int marginAfter = 0;
@@ -47,6 +47,10 @@ class Line {
 
 	public String getListBullet() {
 		return listBullet;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public int getMarginAfter() {

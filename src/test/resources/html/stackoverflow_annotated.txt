@@ -1,0 +1,295 @@
+creation-date : 3 years, 11 months ago
+code : DagRunOrder().payload
+code : TriggerDagRunOperator
+code : PythonOperator
+code : def run_this_func(ds, **kwargs):
+                      print("Remotely received value of {} for message and {} for day".format(
+                          kwargs["dag_run"].conf["message"], kwargs["dag_run"].conf["day"])
+                      )
+
+                  run_this = PythonOperator(
+                      task_id='run_this',
+                      provide_context=True,
+                      python_callable=run_this_func,
+                      dag=dag
+                  )
+code : TriggerDagRunOperator
+code : def trigger(context, dag_run_obj, **kwargs):
+                      dag_run_obj.payload = {
+                          "message": kwargs["dag_run"].conf["message"],
+                          "day": kwargs["dag_run"].conf["day"]
+                      }
+                      return dag_run_obj
+
+                  trigger_step = TriggerDagRunOperator(
+                      task_id="trigger_modelling",
+                      trigger_dag_id="Dummy_Modelling",
+                      provide_context=True,
+                      python_callable=trigger,
+                      dag=dag
+                  )
+code : provide_context
+code : INFO - Subtask: /usr/local/lib/python2.7/dist-packages/airflow/models.py:1927: PendingDeprecationWarning: Invalid arguments were passed to TriggerDagRunOperator. Support for passing such arguments will be dropped in Airflow 2.0. Invalid arguments were:
+                  INFO - Subtask: *args: ()
+                  INFO - Subtask: **kwargs: {'provide_context': True}
+                  INFO - Subtask:   category=PendingDeprecationWarning
+code : INFO - Subtask: Traceback (most recent call last):
+                  INFO - Subtask:   File "/usr/local/lib/python2.7/dist-packages/airflow/models.py", line 1374, in run
+                  INFO - Subtask:     result = task_copy.execute(context=context)
+                  INFO - Subtask:   File "/usr/local/lib/python2.7/dist-packages/airflow/operators/dagrun_operator.py", line 64, in execute
+                  INFO - Subtask:     dro = self.python_callable(context, dro)
+                  INFO - Subtask:   File "/home/user/airflow/dags/dummy_responses.py", line 28, in trigger
+                  INFO - Subtask:     "message": kwargs["dag_run"].conf["message"],
+                  INFO - Subtask: KeyError: 'dag_run'
+code : params
+code : def trigger(context, dag_run_obj):
+                      dag_run_obj.payload = {
+                          "message": context['params']['message'],
+                          "day": context['params']['day']
+                      }
+                      return dag_run_obj
+
+                  trigger_step = TriggerDagRunOperator(
+                      task_id="trigger_modelling",
+                      trigger_dag_id="Dummy_Modelling",
+                      python_callable=trigger,
+                      params={
+                          "message": "{{ dag_run.conf['message'] }}",
+                          "day": "{{ dag_run.conf['day'] }}"
+                      },
+                      dag=dag
+                  )
+code : TriggerDagRunOperator
+user : efbbrown
+reputation : 3,373
+user : efbbrown efbbrown
+                            3,373 5 5 gold badges 28 28 silver badges 46 46 bronze badges
+code : dag_run
+code : python_callable
+code : TriggerDagRunOperator
+code : def trigger(context, dag_run_obj):
+                        dag_run_obj.payload = {
+                            "message": context["dag_run"].conf["message"],
+                            "day": context["dag_run"].conf["day"]
+                        }
+                        return dag_run_obj
+
+                    trigger_step = TriggerDagRunOperator(
+                        task_id="trigger_modelling",
+                        trigger_dag_id="Dummy_Modelling",
+                        python_callable=trigger,
+                        dag=dag
+                    )
+reputation : 3,373
+user : efbbrown efbbrown
+                              3,373 5 5 gold badges 28 28 silver badges 46 46 bronze badges
+comment-comment : How did you end up reading the passed parameters in the triggered DAG? I need to do the same, and while I can confirm the parameter I want to pass is part of the dag run object's payload, I can't seem to "read" it in the triggered DAG.
+comment-date : Jun 19 '18 at 19:51
+code : "{{ dag_run.conf['message'] }}"
+code : "{{ dag_run.conf['day'] }}"
+code : "{{ dag_run.conf['day'] }}"
+comment-comment : I could access the parameters in my triggered dag with "{{ dag_run.conf['message'] }}" and "{{ dag_run.conf['day'] }}" . This relies on the fields in the operator through which you are trying to read the parameters being template_fields. If the "{{ dag_run.conf['day'] }}" pattern doesn't work for you because the fields aren't template_fields, you will be able to extend the operator class which you are using to make those fields template_fields. Let me know if this doesn't make sense and I will include it in my answer.
+comment-date : Jun 19 '18 at 21:52
+comment-comment : * Hmmm.. I generate a file in the first DAG, and then read the file and dynamically generate tasks based on the data in the file, in the triggered DAG. Currently, I have no good way of "sending" the filename to the DAG. I can make it part of the payload, but can't assign it to a variable in the triggered DAG. I had already tried the methods in the examples and the ones you've used too.
+comment-date : Jun 20 '18 at 18:06
+comment-comment : * I programatically create the filename in the first DAG and then use the same logic in the triggered DAG to read it. It is dangerous and error-prone and all that, but till I can figure out a way to pass the filename to the triggered DAG, I have no option, it seems.
+comment-date : Jun 20 '18 at 18:07
+code : Invalid arguments were passed to TriggerDagRunOperator
+code : TriggerDagRunOperator
+comment-comment : @efbbrown this solution is not working in Airflow v2.0.1; i'm getting this error: Invalid arguments were passed to TriggerDagRunOperator . Do you know how we could be passing context in TriggerDagRunOperator in Airflow version 2?
+comment-date : Apr 6 '21 at 0:53
+code : Airflow2.0.x
+code : @efbbrown
+code : from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+
+                    trigger_step = TriggerDagRunOperator(
+                        task_id="trigger_modelling",
+                        trigger_dag_id="Dummy_Modelling",
+                        conf={"message": "{{ dag_run.conf['message'] }}", "day":"{{
+                        dag_run.conf['day'] }}"},
+                        dag=dag
+                    )
+reputation : 2,398
+user : Lucan
+                              2,398 2 2 gold badges 9 9 silver badges 26 26 bronze badges
+reputation : 726
+user : taari taari
+                              726 6 6 silver badges 7 7 bronze badges
+comment-comment : Thankyou @Sawan Vaidya
+comment-date : Apr 26 '21 at 9:50
+comment-comment : * Hi, Is it not possible to create the dag_run_obj payload or the conf parameter dynamically? When triggering the TriggerDagRunOperator? This used to be possible before the python_callable parameter was depreciated in Airflow 2.0.
+comment-date : Jun 11 '21 at 11:41
+comment-comment : * @mathee, Yes, it appears that you can't do that using TriggerDagRunOperator. I solved that by adding an extra PythonOperator right before I called the TriggerDagRunOperator and I set up the dag_run_obj there
+comment-date : Jun 12 '21 at 3:24
+comment-comment : * @taari, I tried setting the dag_run_obj in python operator it didn't worked for me can share the snippet.
+comment-date : Sep 9 '21 at 10:19
+reputation : 21
+user : Adarsh Adarsh
+                              21 3 3 bronze badges
+comment-comment : Hi, welcome to Stackoverflow, can you add some code sample such that it makes it easier to understand.
+comment-date : Sep 7 '19 at 7:20
+
+======
+
+creation-date: 3 years, 11 months ago
+code: DagRunOrder().payload
+code: TriggerDagRunOperator
+code: PythonOperator
+code:                   def run_this_func(ds, **kwargs):
+                      print("Remotely received value of {} for message and {} for day".format(
+                          kwargs["dag_run"].conf["message"], kwargs["dag_run"].conf["day"])
+                      )
+
+                  run_this = PythonOperator(
+                      task_id='run_this',
+                      provide_context=True,
+                      python_callable=run_this_func,
+                      dag=dag
+                  )
+
+code: TriggerDagRunOperator
+code:                   def trigger(context, dag_run_obj, **kwargs):
+                      dag_run_obj.payload = {
+                          "message": kwargs["dag_run"].conf["message"],
+                          "day": kwargs["dag_run"].conf["day"]
+                      }
+                      return dag_run_obj
+
+                  trigger_step = TriggerDagRunOperator(
+                      task_id="trigger_modelling",
+                      trigger_dag_id="Dummy_Modelling",
+                      provide_context=True,
+                      python_callable=trigger,
+                      dag=dag
+                  )
+
+code: provide_context
+code:                   INFO - Subtask: /usr/local/lib/python2.7/dist-packages/airflow/models.py:1927: PendingDeprecationWarning: Invalid arguments were passed to TriggerDagRunOperator. Support for passing such arguments will be dropped in Airflow 2.0. Invalid arguments were:
+                  INFO - Subtask: *args: ()
+                  INFO - Subtask: **kwargs: {'provide_context': True}
+                  INFO - Subtask:   category=PendingDeprecationWarning
+
+code:                   INFO - Subtask: Traceback (most recent call last):
+                  INFO - Subtask:   File "/usr/local/lib/python2.7/dist-packages/airflow/models.py", line 1374, in run
+                  INFO - Subtask:     result = task_copy.execute(context=context)
+                  INFO - Subtask:   File "/usr/local/lib/python2.7/dist-packages/airflow/operators/dagrun_operator.py", line 64, in execute
+                  INFO - Subtask:     dro = self.python_callable(context, dro)
+                  INFO - Subtask:   File "/home/user/airflow/dags/dummy_responses.py", line 28, in trigger
+                  INFO - Subtask:     "message": kwargs["dag_run"].conf["message"],
+                  INFO - Subtask: KeyError: 'dag_run'
+
+code: params
+code:                   def trigger(context, dag_run_obj):
+                      dag_run_obj.payload = {
+                          "message": context['params']['message'],
+                          "day": context['params']['day']
+                      }
+                      return dag_run_obj
+
+                  trigger_step = TriggerDagRunOperator(
+                      task_id="trigger_modelling",
+                      trigger_dag_id="Dummy_Modelling",
+                      python_callable=trigger,
+                      params={
+                          "message": "{{ dag_run.conf['message'] }}",
+                          "day": "{{ dag_run.conf['day'] }}"
+                      },
+                      dag=dag
+                  )
+
+code: TriggerDagRunOperator
+user:                           efbbrown
+
+reputation:                             3,373
+user:                           efbbrown efbbrown
+                            3,373 5 5 gold badges 28 28 silver badges 46 46 bronze badges
+
+code: dag_run
+code: python_callable
+code: TriggerDagRunOperator
+code:                     def trigger(context, dag_run_obj):
+                        dag_run_obj.payload = {
+                            "message": context["dag_run"].conf["message"],
+                            "day": context["dag_run"].conf["day"]
+                        }
+                        return dag_run_obj
+
+                    trigger_step = TriggerDagRunOperator(
+                        task_id="trigger_modelling",
+                        trigger_dag_id="Dummy_Modelling",
+                        python_callable=trigger,
+                        dag=dag
+                    )
+
+reputation:                               3,373
+user:                             efbbrown efbbrown
+                              3,373 5 5 gold badges 28 28 silver badges 46 46 bronze badges
+
+comment-comment:                             How did you end up reading the passed parameters in the triggered DAG? I need to do the same, and while I can confirm the parameter I want to pass is part of the dag run object's payload, I can't seem to "read" it in the triggered DAG.
+
+comment-date:                             Jun 19 '18 at 19:51
+
+code: "{{ dag_run.conf['message'] }}"
+code: "{{ dag_run.conf['day'] }}"
+code: "{{ dag_run.conf['day'] }}"
+comment-comment:                             I could access the parameters in my triggered dag with "{{ dag_run.conf['message'] }}" and "{{ dag_run.conf['day'] }}" . This relies on the fields in the operator through which you are trying to read the parameters being template_fields. If the "{{ dag_run.conf['day'] }}" pattern doesn't work for you because the fields aren't template_fields, you will be able to extend the operator class which you are using to make those fields template_fields. Let me know if this doesn't make sense and I will include it in my answer.
+
+comment-date:                             Jun 19 '18 at 21:52
+
+comment-comment:                             Hmmm.. I generate a file in the first DAG, and then read the file and dynamically generate tasks based on the data in the file, in the triggered DAG. Currently, I have no good way of "sending" the filename to the DAG. I can make it part of the payload, but can't assign it to a variable in the triggered DAG. I had already tried the methods in the examples and the ones you've used too.
+
+comment-date:                             Jun 20 '18 at 18:06
+
+comment-comment:                             I programatically create the filename in the first DAG and then use the same logic in the triggered DAG to read it. It is dangerous and error-prone and all that, but till I can figure out a way to pass the filename to the triggered DAG, I have no option, it seems.
+
+comment-date:                             Jun 20 '18 at 18:07
+
+code: Invalid arguments were passed to TriggerDagRunOperator
+code: TriggerDagRunOperator
+comment-comment:                             @efbbrown this solution is not working in Airflow v2.0.1; i'm getting this error: Invalid arguments were passed to TriggerDagRunOperator . Do you know how we could be passing context in TriggerDagRunOperator in Airflow version 2?
+
+comment-date:                             Apr 6 '21 at 0:53
+
+code: Airflow2.0.x
+code: @efbbrown
+code:                     from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+
+                    trigger_step = TriggerDagRunOperator(
+                        task_id="trigger_modelling",
+                        trigger_dag_id="Dummy_Modelling",
+                        conf={"message": "{{ dag_run.conf['message'] }}", "day":"{{
+                        dag_run.conf['day'] }}"},
+                        dag=dag
+                    )
+
+reputation:                               2,398
+user:                             Lucan
+                              2,398 2 2 gold badges 9 9 silver badges 26 26 bronze badges
+
+reputation:                               726
+user:                             taari taari
+                              726 6 6 silver badges 7 7 bronze badges
+
+comment-comment:                             Thankyou @Sawan Vaidya
+
+comment-date:                             Apr 26 '21 at 9:50
+
+comment-comment:                             Hi, Is it not possible to create the dag_run_obj payload or the conf parameter dynamically? When triggering the TriggerDagRunOperator? This used to be possible before the python_callable parameter was depreciated in Airflow 2.0.
+
+comment-date:                             Jun 11 '21 at 11:41
+
+comment-comment:                             @mathee, Yes, it appears that you can't do that using TriggerDagRunOperator. I solved that by adding an extra PythonOperator right before I called the TriggerDagRunOperator and I set up the dag_run_obj there
+
+comment-date:                             Jun 12 '21 at 3:24
+
+comment-comment:                             @taari, I tried setting the dag_run_obj in python operator it didn't worked for me can share the snippet.
+
+comment-date:                             Sep 9 '21 at 10:19
+
+reputation:                               21
+user:                             Adarsh Adarsh
+                              21 3 3 bronze badges
+
+comment-comment:                             Hi, welcome to Stackoverflow, can you add some code sample such that it makes it easier to understand.
+
+comment-date:                             Sep 7 '19 at 7:20

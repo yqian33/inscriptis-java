@@ -17,6 +17,7 @@ package ch.x28.inscriptis;
 
 import static org.assertj.core.api.Assertions.*;
 
+import ch.x28.inscriptis.models.Canvas;
 import org.junit.jupiter.api.Test;
 
 import ch.x28.inscriptis.HtmlProperties.Display;
@@ -31,7 +32,7 @@ public class HtmlElementTest {
 	@Test
 	public void testRefinement() {
 
-		HtmlElement span = new HtmlElement("span", Display.INLINE, null, " ", " ", 0, 0, 0, true);
+		HtmlElement span = new HtmlElement("span", Display.INLINE, null, " ", " ", 0, 0, 0, true, new Canvas(), 0, null);
 		HtmlElement pre = new HtmlElement("pre", Display.BLOCK, WhiteSpace.PRE);
 		HtmlElement code = new HtmlElement("code");
 

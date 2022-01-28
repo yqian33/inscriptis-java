@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+import ch.x28.inscriptis.models.Canvas;
+import ch.x28.inscriptis.models.TableCellCanvas;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -58,6 +60,7 @@ public class Inscriptis {
 	 * The canvases used for displaying text. cleanTextLines[0] refers to the root canvas; tables write into child
 	 * canvases that are created for every table line and merged with the root canvas at the end of a table.
 	 */
+	private Canvas canvas;
 	private Stack<List<String>> cleanTextLines;
 
 	private Stack<Table> currentTable;
@@ -91,7 +94,8 @@ public class Inscriptis {
 		currentLine = new Stack<>();
 		nextLine = new Stack<>();
 
-		currentTag.push(this.config.getCss().get("body"));
+		canvas = new Canvas();
+		currentTag.push(this.config.getCss().get("body").setCanvas(canvas));
 		currentLine.push(new Line());
 		nextLine.push(new Line());
 
@@ -99,6 +103,7 @@ public class Inscriptis {
 		// cleanTextLines[0] refers to the root canvas; tables write into child
 		// canvases that are created for every table line and merged with the
 		// root canvas at the end of a table
+
 		cleanTextLines = new Stack<>();
 		cleanTextLines.push(new ArrayList<>());
 
@@ -131,9 +136,18 @@ public class Inscriptis {
 		return StringUtils.stripTrailing(text);
 	}
 
+	public String getAnnotatedText() {
+		return StringUtils.stripTrailing(canvas.getText());
+	}
+
+	public List<Canvas.Annotation> getAnnotations() {
+		return canvas.getAnnotations();
+	}
+
 	private void endA() {
 
 		if (!linkTarget.isEmpty()) {
+			currentTag.peek().write(String.format("](%s)", linkTarget));
 			currentLine.peek().addContent(String.format("](%s)", linkTarget));
 		}
 	}
@@ -145,7 +159,6 @@ public class Inscriptis {
 	}
 
 	private void endTable() {
-
 		if (!currentTable.isEmpty() && currentTable.peek().isTdOpen()) {
 			endTd();
 		}
@@ -154,11 +167,34 @@ public class Inscriptis {
 
 		Table table = currentTable.pop();
 		writeLineVerbatim(table.getText());
+
+		String outOfTableText = currentTag.peek().getCanvas().getText();
+		HtmlElement preTag = currentTag.elementAt(currentTag.size()-2);
+		if (!StringUtils.isEmpty(outOfTableText)) {
+			preTag.write(outOfTableText);
+			preTag.getCanvas().writeNewLine();
+		}
+
+		Long startIndex = preTag.getCanvas().currentBlock.getIndex();
+		preTag.writeVerbatimText(table.getContentText());
+		preTag.getCanvas().flushInline();
+
+		// transfer annotations from the current tag
+		if (currentTag.peek().getAnnotation() != null && !currentTag.peek().getAnnotation().isEmpty()) {
+			Long endIndex = preTag.getCanvas().currentBlock.getIndex();
+			for (String a : currentTag.peek().getAnnotation()) {
+				preTag.getCanvas().getAnnotations().add(new Canvas.Annotation(startIndex, endIndex, a));
+			}
+		}
+		// transfer in-table annotations
+		preTag.getCanvas().getAnnotations().addAll(
+				table.getAnnotations(startIndex.intValue(), preTag.getCanvas().getLeftMargin()));
 	}
 
 	private void endTd() {
 
 		if (!currentTable.isEmpty() && currentTable.peek().isTdOpen()) {
+			currentTag.peek().getCanvas().closeTag(currentTag.peek());
 			currentTable.peek().setTdOpen(false);
 			writeLine(true);
 			cleanTextLines.pop();
@@ -188,6 +224,7 @@ public class Inscriptis {
 	private void handleData(String data) {
 
 		HtmlElement curTag = currentTag.peek();
+		curTag.write(data); // write data in canvas for annotation
 		if (curTag.getDisplay() == Display.NONE) {
 			return;
 		}
@@ -200,6 +237,7 @@ public class Inscriptis {
 		// add prefix, if present
 		data = curTag.getPrefix() + data + curTag.getSuffix();
 
+
 		// determine whether to add this content to a table column or to a standard line
 		currentLine.peek().addContent(data);
 	}
@@ -211,7 +249,7 @@ public class Inscriptis {
 	 */
 	private void handleEndTag(Node node) {
 
-		HtmlElement curTag = currentTag.pop();
+		HtmlElement curTag = currentTag.peek(); // pop from outside of handleEndTag
 		nextLine.peek().setPadding(currentLine.peek().getPadding() - curTag.getPadding());
 		currentLine.peek().setMarginAfter(Math.max(currentLine.peek().getMarginAfter(), curTag.getMarginAfter()));
 
@@ -253,8 +291,11 @@ public class Inscriptis {
 		NamedNodeMap attrs = node.getAttributes();
 
 		// use the css to handle tags known to it
-		HtmlElement curTag = currentTag.peek().getRefinedHtmlElement(
-			config.getCss().getOrDefault(tag, Inscriptis.DEFAULT_ELEMENT));
+		HtmlElement baseElement = config.getCss().getOrDefault(tag, Inscriptis.DEFAULT_ELEMENT)
+				.clone()
+				.setTag(tag);
+		HtmlElement e = config.getAttributesHandler().applyHandlers(attrs, baseElement);
+		HtmlElement curTag = currentTag.peek().getRefinedHtmlElement(e);
 
 		Node attrStyle = attrs.getNamedItem("style");
 		if (attrStyle != null) {
@@ -322,7 +363,7 @@ public class Inscriptis {
 	/**
 	 * Parses the HTML tree.
 	 *
-	 * @param document the W3C document
+	 * @param node the W3C document
 	 */
 	private void parseHtmlTree(Node node) {
 
@@ -334,6 +375,8 @@ public class Inscriptis {
 
 		if (node.getNodeType() == Node.ELEMENT_NODE) {
 			handleStartTag(node);
+			HtmlElement curTag = currentTag.peek();
+			curTag.getCanvas().openTag(curTag);
 		}
 
 		if (node.getNodeType() == Node.TEXT_NODE) {
@@ -350,6 +393,8 @@ public class Inscriptis {
 
 		if (node.getNodeType() == Node.ELEMENT_NODE) {
 			handleEndTag(node);
+			HtmlElement endTag = currentTag.pop();
+			endTag.getCanvas().closeTag(endTag);
 		}
 	}
 
@@ -372,6 +417,7 @@ public class Inscriptis {
 		}
 
 		if (!linkTarget.isEmpty()) {
+			currentTag.peek().write("[");
 			currentLine.peek().addContent("[");
 		}
 	}
@@ -391,6 +437,7 @@ public class Inscriptis {
 		}
 
 		if (!imageText.isEmpty() && !(config.isDeduplicateCaptions() && imageText.equals(lastCaption))) {
+			currentTag.peek().write(String.format("[%s]", imageText));
 			currentLine.peek().addContent(String.format("[%s]", imageText));
 			lastCaption = imageText;
 		}
@@ -410,8 +457,10 @@ public class Inscriptis {
 		if (bullet instanceof Integer) {
 			int bulletNumber = (int) liCounter.pop();
 			liCounter.push(bulletNumber + 1);
+			currentTag.peek().setListBullet(String.format("%s. ", bulletNumber));
 			currentLine.peek().setListBullet(String.format("%s. ", bulletNumber));
 		} else {
+			currentTag.peek().setListBullet((String) bullet);
 			currentLine.peek().setListBullet(bullet.toString());
 		}
 	}
@@ -422,7 +471,8 @@ public class Inscriptis {
 	}
 
 	private void startTable() {
-		currentTable.push(new Table());
+		currentTag.peek().setCanvas(new Canvas());
+		currentTable.push(new Table().setCellSeparator(config.getTableCellSeparator()));
 	}
 
 	private void startTd() {
@@ -430,6 +480,12 @@ public class Inscriptis {
 		if (currentTable.isEmpty()) {
 			return;
 		}
+
+		TableCellCanvas tableCellCanvas = new TableCellCanvas(
+				currentTag.peek().getAlign(),
+				currentTag.peek().getValign());
+
+		currentTag.peek().setCanvas(tableCellCanvas);
 
 		Table curTable = currentTable.peek();
 
@@ -443,6 +499,7 @@ public class Inscriptis {
 		currentLine.push(new Line());
 		nextLine.push(new Line());
 		curTable.addCell(cleanTextLines.peek());
+		curTable.addCanvasCell(tableCellCanvas);
 		curTable.setTdOpen(true);
 	}
 
@@ -481,6 +538,9 @@ public class Inscriptis {
 			currentLine.peek().setMarginBefore(Math.max(currentLine.peek().getMarginBefore(), currentTag.peek().getMarginBefore()));
 			return false;
 		}
+
+		// TODO be careful here, since writeLine is called in multple places
+		currentTag.peek().getCanvas().writeNewLine();
 
 		String line = currentLine.peek().getText();
 		cleanTextLines.peek().add(line);

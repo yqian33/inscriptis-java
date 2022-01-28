@@ -17,6 +17,9 @@ package ch.x28.inscriptis;
 
 import ch.x28.inscriptis.HtmlProperties.Display;
 import ch.x28.inscriptis.HtmlProperties.WhiteSpace;
+import ch.x28.inscriptis.models.Canvas;
+
+import java.util.Set;
 
 /**
  * The HtmlElement class stores the CSS properties.
@@ -24,7 +27,7 @@ import ch.x28.inscriptis.HtmlProperties.WhiteSpace;
  * @author Sascha Wolski
  * @author Matthias Hewelt
  */
-class HtmlElement {
+public class HtmlElement {
 
 	/**
 	 * Name of the given HtmlElement
@@ -51,6 +54,10 @@ class HtmlElement {
 	 */
 	private int marginAfter = 0;
 	/**
+	 * Vertical margin after the previous tag's content.
+	 */
+	private int previousMarginAfter = 0;
+	/**
 	 * Horizontal padding before the tag's content.
 	 */
 	private int padding = 0;
@@ -62,6 +69,60 @@ class HtmlElement {
 	 * Limit printing of whitespace affixes to elements with `normal` whitepsace handling.
 	 */
 	private boolean limitWhitespaceAffixes = false;
+
+	/**
+	 *
+	 */
+	private String listBullet = "";
+
+	private Set<String> annotation;
+
+	private Canvas canvas;
+
+	private HtmlProperties.HorizontalAlignment align  = HtmlProperties.HorizontalAlignment.LEFT;
+
+	private HtmlProperties.VerticalAlignment valign  = HtmlProperties.VerticalAlignment.TOP;
+
+	public HtmlProperties.HorizontalAlignment getAlign() {
+		return align;
+	}
+
+	public void setAlign(HtmlProperties.HorizontalAlignment align) {
+		this.align = align;
+	}
+
+	public HtmlProperties.VerticalAlignment getValign() {
+		return valign;
+	}
+
+	public void setValign(HtmlProperties.VerticalAlignment valign) {
+		this.valign = valign;
+	}
+
+	public String getListBullet() {
+		return listBullet;
+	}
+
+	public void setListBullet(String listBullet) {
+		this.listBullet = listBullet;
+	}
+
+	public Set<String> getAnnotation() {
+		return annotation;
+	}
+
+	public void setAnnotation(Set<String> annotation) {
+		this.annotation = annotation;
+	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
+	public HtmlElement setCanvas(Canvas canvas) {
+		this.canvas = canvas;
+		return this;
+	}
 
 	public HtmlElement() {
 	}
@@ -121,7 +182,10 @@ class HtmlElement {
 		int marginBefore,
 		int marginAfter,
 		int padding,
-		boolean limitWhitespaceAffixes) {
+		boolean limitWhitespaceAffixes,
+		Canvas canvas,
+		int previousMarginAfter,
+	        Set<String> annotation) {
 
 		this.tag = tag;
 		this.prefix = prefix;
@@ -132,6 +196,9 @@ class HtmlElement {
 		this.padding = padding;
 		this.whitespace = whitespace;
 		this.limitWhitespaceAffixes = limitWhitespaceAffixes;
+		this.canvas = canvas;
+		this.previousMarginAfter = previousMarginAfter;
+		this.annotation = annotation;
 	}
 
 	public HtmlElement(String tag, String prefix, String suffix) {
@@ -148,16 +215,20 @@ class HtmlElement {
 	public HtmlElement clone() {
 
 		return new HtmlElement(
-			tag,
-			display,
-			whitespace,
-			prefix,
-			suffix,
-			marginBefore,
-			marginAfter,
-			padding,
-			limitWhitespaceAffixes);
+				tag,
+				display,
+				whitespace,
+				prefix,
+				suffix,
+				marginBefore,
+				marginAfter,
+				padding,
+				limitWhitespaceAffixes,
+				canvas,
+				previousMarginAfter,
+				annotation);
 	}
+
 
 	public Display getDisplay() {
 		return display;
@@ -165,6 +236,10 @@ class HtmlElement {
 
 	public int getMarginAfter() {
 		return marginAfter;
+	}
+
+	public int getPreviousMarginAfter() {
+		return previousMarginAfter;
 	}
 
 	public int getMarginBefore() {
@@ -177,6 +252,10 @@ class HtmlElement {
 
 	public String getPrefix() {
 		return prefix;
+	}
+
+	public void setLimitWhitespaceAffixes(boolean isLimitWhitespaceAffixes) {
+		this.limitWhitespaceAffixes = isLimitWhitespaceAffixes;
 	}
 
 	/**
@@ -211,21 +290,31 @@ class HtmlElement {
 			}
 		}
 
+		int previousMarginAfter = 0;
+		if (htmlElement.display == Display.BLOCK && display == Display.BLOCK) {
+			previousMarginAfter = marginAfter;
+		}
+
 		return new HtmlElement(
-			htmlElement.getTag(),
-			display,
-			whiteSpace,
-			prefix,
-			suffix,
-			htmlElement.getMarginBefore(),
-			htmlElement.getMarginAfter(),
-			htmlElement.getPadding(),
-			false);
+				htmlElement.getTag(),
+				display,
+				whiteSpace,
+				prefix,
+				suffix,
+				htmlElement.getMarginBefore(),
+				htmlElement.getMarginAfter(),
+				htmlElement.getPadding(),
+				htmlElement.isLimitWhitespaceAffixes(),
+				canvas,
+				previousMarginAfter,
+				htmlElement.getAnnotation());
+
 	}
 
 	public String getSuffix() {
 		return suffix;
 	}
+
 
 	public String getTag() {
 		return tag;
@@ -241,10 +330,6 @@ class HtmlElement {
 
 	public void setDisplay(Display display) {
 		this.display = display;
-	}
-
-	public void setLimitWhitespaceAffixes(boolean limitWhitespaceAffixes) {
-		this.limitWhitespaceAffixes = limitWhitespaceAffixes;
 	}
 
 	public void setMarginAfter(int marginAfter) {
@@ -267,25 +352,54 @@ class HtmlElement {
 		this.suffix = suffix;
 	}
 
-	public void setTag(String tag) {
+	public HtmlElement setTag(String tag) {
 		this.tag = tag;
+		return this;
 	}
 
 	public void setWhitespace(WhiteSpace whitespace) {
 		this.whitespace = whitespace;
 	}
 
+	public void setPreviousMarginAfter(int m) {
+		this.previousMarginAfter = m;
+	}
+
 	@Override
 	public String toString() {
-		return "HtmlElement [tag=" + tag +
+		return "HtmlElement[tag=" + tag +
 			", display=" + display +
 			", whitespace=" + whitespace +
 			", prefix=" + prefix +
 			", suffix=" + suffix +
+			", previousMarginAfter=" + previousMarginAfter +
 			", marginBefore=" + marginBefore +
 			", marginAfter=" + marginAfter +
 			", padding=" + padding +
+			", Canvas=" + canvas +
+			", Annotation=" + annotation +
 			", limitWhitespaceAffixes=" + limitWhitespaceAffixes + "]";
 	}
 
+	public void write(String text) {
+		if (text == null || display == Display.NONE) {
+			return;
+		}
+		canvas.write(this, prefix + text + suffix, null);
+	}
+
+	public void writeVerbatimText(String text) {
+		if (text == null || text.isEmpty()) {
+			return;
+		}
+		if (display == Display.BLOCK) {
+			canvas.openBlock(this);
+		}
+
+		canvas.write(this, text, WhiteSpace.PRE);
+
+		if (display == Display.BLOCK) {
+			canvas.closeBlock(this);
+		}
+	}
 }
