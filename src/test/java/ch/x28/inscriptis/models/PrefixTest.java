@@ -2,7 +2,6 @@ package ch.x28.inscriptis.models;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import ch.x28.inscriptis.Prefix;
 import org.junit.jupiter.api.Test;
 
 public class PrefixTest {

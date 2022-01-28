@@ -1,4 +1,6 @@
-package ch.x28.inscriptis;
+package ch.x28.inscriptis.models;
+
+import ch.x28.inscriptis.StringUtils;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -10,7 +12,7 @@ public class Prefix {
   private List<String> bullets = new ArrayList<>();
   private boolean consumed = false;
 
-  public void registerPrefix(int paddingInline, String bullet) {
+  void registerPrefix(int paddingInline, String bullet) {
     currentPadding += paddingInline;
     paddings.add(paddingInline);
     if (bullet != null) {
@@ -39,7 +41,7 @@ public class Prefix {
     return bullet;
   }
 
-  public String getUnconsumedBullet() {
+  String getUnconsumedBullet() {
     if (consumed) {
       return "";
     }
@@ -52,7 +54,7 @@ public class Prefix {
     return res + bullet;
   }
 
-  public void removeLastPrefix() {
+  void removeLastPrefix() {
     int paddingSize = paddings.size();
     if (paddingSize > 0) {
       int p = paddings.get(paddingSize-1);
@@ -74,11 +76,11 @@ public class Prefix {
     return res + bullet;
   }
 
-  public String rest() {
+  String rest() {
     return StringUtils.repeat(" ", currentPadding);
   }
 
-  public int getCurrentPadding() {
+  int getCurrentPadding() {
     return currentPadding;
   }
 
@@ -106,7 +108,7 @@ public class Prefix {
     return consumed;
   }
 
-  public void setConsumed(boolean consumed) {
+  void setConsumed(boolean consumed) {
     this.consumed = consumed;
   }
 }

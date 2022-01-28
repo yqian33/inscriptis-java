@@ -2,7 +2,6 @@ package ch.x28.inscriptis.models;
 
 import ch.x28.inscriptis.HtmlElement;
 import ch.x28.inscriptis.HtmlProperties;
-import ch.x28.inscriptis.Prefix;
 import ch.x28.inscriptis.StringUtils;
 
 import java.util.ArrayList;
