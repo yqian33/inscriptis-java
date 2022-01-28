@@ -293,10 +293,10 @@ public class Inscriptis {
 
 		// use the css to handle tags known to it
 		HtmlElement baseElement = config.getCss().getOrDefault(tag, Inscriptis.DEFAULT_ELEMENT)
-				.clone()
+				.clone()  // make a copy to avoid changing default css profile
 				.setTag(tag);
-		HtmlElement e = config.getAttributesHandler().applyHandlers(attrs, baseElement);
-		HtmlElement curTag = currentTag.peek().getRefinedHtmlElement(e);
+		HtmlElement element = config.getAttributesHandler().applyHandlers(attrs, baseElement);
+		HtmlElement curTag = currentTag.peek().getRefinedHtmlElement(element);
 
 		Node attrStyle = attrs.getNamedItem("style");
 		if (attrStyle != null) {
