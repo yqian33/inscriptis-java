@@ -163,6 +163,10 @@ public class ParserConfig {
 		return tableCellSeparator;
 	}
 
+	public void setTableCellSeparator(String tableCellSeparator) {
+		this.tableCellSeparator = tableCellSeparator;
+	}
+
 	public AttributesHandler getAttributesHandler() {
 		return attributesHandler;
 	}

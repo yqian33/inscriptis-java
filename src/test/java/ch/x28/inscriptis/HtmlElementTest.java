@@ -17,6 +17,7 @@ package ch.x28.inscriptis;
 
 import static org.assertj.core.api.Assertions.*;
 
+import ch.x28.inscriptis.models.Canvas;
 import org.junit.jupiter.api.Test;
 
 import ch.x28.inscriptis.HtmlProperties.Display;

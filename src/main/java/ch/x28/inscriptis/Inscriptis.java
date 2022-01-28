@@ -16,13 +16,12 @@
 package ch.x28.inscriptis;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.SerializationUtils;
+import ch.x28.inscriptis.models.Canvas;
+import ch.x28.inscriptis.models.TableCellCanvas;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -193,6 +192,7 @@ public class Inscriptis {
 	}
 
 	private void endTd() {
+
 		if (!currentTable.isEmpty() && currentTable.peek().isTdOpen()) {
 			currentTag.peek().getCanvas().closeTag(currentTag.peek());
 			currentTable.peek().setTdOpen(false);

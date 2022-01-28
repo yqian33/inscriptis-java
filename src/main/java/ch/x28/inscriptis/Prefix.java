@@ -5,67 +5,37 @@ import java.util.ArrayList;
 
 public class Prefix {
 
-  public int currentPadding = 0;
-  public List<Integer> paddings = new ArrayList();
-  public List<String> bullets = new ArrayList();
-  public boolean consumed = false;
-
-  public int getCurrentPadding() {
-    return currentPadding;
-  }
-
-  public void setCurrentPadding(int current_padding) {
-    this.currentPadding = current_padding;
-  }
-
-  public List<Integer> getPaddings() {
-    return paddings;
-  }
-
-  public void setPaddings(List<Integer> paddings) {
-    this.paddings = paddings;
-  }
-
-  public List<String> getBullets() {
-    return bullets;
-  }
-
-  public void setBullets(List<String> bullets) {
-    this.bullets = bullets;
-  }
-
-  public boolean isConsumed() {
-    return consumed;
-  }
-
-  public void setConsumed(boolean consumed) {
-    this.consumed = consumed;
-  }
+  private int currentPadding = 0;
+  private List<Integer> paddings = new ArrayList<>();
+  private List<String> bullets = new ArrayList<>();
+  private boolean consumed = false;
 
   public void registerPrefix(int paddingInline, String bullet) {
     currentPadding += paddingInline;
     paddings.add(paddingInline);
-
     if (bullet != null) {
       bullets.add(bullet);
+    } else {
+      bullets.add("");
     }
   }
 
-  public String popNextBullet() {
-    int next_bullet_idx = 1;
-    for (int i = bullets.size()-1; i >=0; i--) {
-      if (bullets.get(i) == null) {
-        continue;
-      }
-      next_bullet_idx = bullets.size() - i;
-    }
-    next_bullet_idx -= 1;
+  private String popNextBullet() {
+    Integer nextBulletIdx = null;
 
-    if (next_bullet_idx == 0) {
+    for (int i = bullets.size()-1; i >=0; i--) {
+      if (!StringUtils.isEmpty(bullets.get(i))) {
+        nextBulletIdx = i;
+        break;
+      }
+    }
+
+    if (nextBulletIdx == null) {
       return "";
     }
-    String bullet = bullets.get(next_bullet_idx);
-    bullets.set(next_bullet_idx, "");
+
+    String bullet = bullets.get(nextBulletIdx);
+    bullets.set(nextBulletIdx, "");
     return bullet;
   }
 
@@ -108,4 +78,35 @@ public class Prefix {
     return StringUtils.repeat(" ", currentPadding);
   }
 
+  public int getCurrentPadding() {
+    return currentPadding;
+  }
+
+  public void setCurrentPadding(int current_padding) {
+    this.currentPadding = current_padding;
+  }
+
+  public List<Integer> getPaddings() {
+    return paddings;
+  }
+
+  public void setPaddings(List<Integer> paddings) {
+    this.paddings = paddings;
+  }
+
+  public List<String> getBullets() {
+    return bullets;
+  }
+
+  public void setBullets(List<String> bullets) {
+    this.bullets = bullets;
+  }
+
+  public boolean isConsumed() {
+    return consumed;
+  }
+
+  public void setConsumed(boolean consumed) {
+    this.consumed = consumed;
+  }
 }

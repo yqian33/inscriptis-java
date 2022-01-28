@@ -1,5 +1,8 @@
-package ch.x28.inscriptis;
+package ch.x28.inscriptis.models;
 
+import ch.x28.inscriptis.HtmlProperties;
+import ch.x28.inscriptis.Line;
+import ch.x28.inscriptis.Prefix;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
@@ -18,11 +21,7 @@ public class Block extends Line {
     this.prefixObj = prefix;
   }
 
-  public Prefix getPrefixObj() {
-    return prefixObj;
-  }
-
-  public Block newBlock() {
+  Block newBlock() {
     this.prefixObj.setConsumed(false);
     return new Block(index + 1, this.prefixObj);
   }
@@ -40,7 +39,7 @@ public class Block extends Line {
     return getContent();
   }
 
-  public void merge(String text, HtmlProperties.WhiteSpace whiteSpace) {
+  void merge(String text, HtmlProperties.WhiteSpace whiteSpace) {
     if ( whiteSpace == HtmlProperties.WhiteSpace.PRE) {
       mergePreText(text);
     } else {
@@ -48,7 +47,7 @@ public class Block extends Line {
     }
   }
 
-  public void mergeNormalText(String text) {
+  void mergeNormalText(String text) {
     List<String> normalizedText = new ArrayList<>();
     for (char ch : text.toCharArray()) {
       if (!Character.isWhitespace(ch)) {
@@ -61,9 +60,10 @@ public class Block extends Line {
     }
 
     if (normalizedText.size() > 0) {
+      String prefixFirst = prefixObj.first();
       String resText = String.join("", normalizedText);
       if (getContent() == null || getContent().isEmpty()) {
-        resText = prefixObj.first() + resText;
+        resText = prefixFirst + resText;
       }
       resText = StringEscapeUtils.unescapeCsv(resText);
       resText = StringEscapeUtils.unescapeHtml(resText);
@@ -72,7 +72,7 @@ public class Block extends Line {
     }
   }
 
-  public void mergePreText(String text) {
+  void mergePreText(String text) {
     String ntext = text.replace("\n", "\n"+ prefixObj.rest());
     String prefixFirst = prefixObj.first();
     String resText = prefixFirst + ntext;
@@ -92,4 +92,15 @@ public class Block extends Line {
     this.index = index;
   }
 
+  public boolean isCollapsableWhitespace() {
+    return collapsableWhitespace;
+  }
+
+  public void setCollapsableWhitespace(boolean collapsableWhitespace) {
+    this.collapsableWhitespace = collapsableWhitespace;
+  }
+
+  Prefix getPrefixObj() {
+    return prefixObj;
+  }
 }

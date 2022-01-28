@@ -1,4 +1,7 @@
-package ch.x28.inscriptis;
+package ch.x28.inscriptis.models;
+
+import ch.x28.inscriptis.HtmlProperties;
+import ch.x28.inscriptis.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,13 +34,13 @@ public class TableCellCanvas extends Canvas {
     if (this.width != null && this.width > 0) {
       return this.width;
     }
-    List<Integer> linesSize = getLines().stream().map(String::length).collect(Collectors.toList());
+    List<Integer> linesSize = getLines(blocks).stream().map(String::length).collect(Collectors.toList());
     return Collections.max(linesSize);
   }
 
-  private List<String> getLines() {
+  private List<String> getLines(List<String> blocks) {
     List<String> result = new ArrayList<>();
-    for (String str: this.blocks) {
+    for (String str: blocks) {
       List<String> splitted = Arrays.asList(str.split("\n"));
       result.addAll(splitted);
     }
@@ -46,7 +49,7 @@ public class TableCellCanvas extends Canvas {
 
   public Integer getNormalizedBlocks() {
     flushInline();
-    this.blocks = getLines();
+    this.blocks = getLines(blocks);
     if (this.blocks == null || this.blocks.isEmpty()) {
       this.blocks = Arrays.asList("");
     }
@@ -82,7 +85,14 @@ public class TableCellCanvas extends Canvas {
     this.width = width;
     List<String> updated = new ArrayList<>();
     for (String str: blocks) {
-      String padded = org.apache.commons.lang.StringUtils.rightPad(str, width);
+      String padded = "";
+      if (align == HtmlProperties.HorizontalAlignment.RIGHT) {
+        padded = StringUtils.padLeft(str, width);
+      } else if (align == HtmlProperties.HorizontalAlignment.LEFT) {
+        padded = StringUtils.padRight(str, width);
+      } else {
+        padded = StringUtils.padCenter(str, width);
+      }
       updated.add(padded);
 
     }
@@ -102,14 +112,40 @@ public class TableCellCanvas extends Canvas {
       return annotations;
     }
 
-    // TODO: the more challenging one - multiple cell lines
+    // the more challenging one - multiple cell lines
+    List<Integer> lineBreakPos = StringUtils.accumulate(lineWidth);
+    List<List<Annotation>> annotationLines = generateList(getBlocks());
 
-    /*
-        # the more challenging one - multiple cell lines
-        line_break_pos = list(accumulate(self.line_width))
-        annotation_lines = [[] for _ in self.blocks]
-     */
-    return new ArrayList<>();
+    // # assign annotations to the corresponding line
+    for (Annotation annotation: getAnnotations()) {
+      for (int i = 0; i < lineBreakPos.size(); i ++) {
+        int lineBreak = lineBreakPos.get(i);
+        if (annotation.start <= lineBreak + i) {
+          annotationLines.get(i + verticalPadding).add(annotation);
+          break;
+        }
+      }
+    }
+
+    // compute the annotation index based on its line and delta :)
+    List<Annotation> result = new ArrayList<>();
+    index += verticalPadding; // newlines introduced by the padding
+    int len = Math.min(annotationLines.size(), lineWidth.size());
+    for (int i = 0; i < len; i ++) {
+      List<Annotation> a = horizontalShift(annotationLines.get(i), lineWidth.get(i), width, align, index);
+      result.addAll(a);
+      index += rowWidth - lineWidth.get(i);
+    }
+    lineWidth = StringUtils.repeatAsList( width, lineWidth.size());
+    return result;
+  }
+
+  private static List<List<Annotation>> generateList(List<String> blocks) {
+    List<List<Annotation>> result = new ArrayList<>();
+    for (int i = 0; i < blocks.size(); i++) {
+      result.add(new ArrayList<>());
+    }
+    return result;
   }
 
   private List<Annotation> horizontalShift(List<Annotation> annotations,
@@ -117,7 +153,7 @@ public class TableCellCanvas extends Canvas {
                                            int lineWidth,
                                            HtmlProperties.HorizontalAlignment align,
                                            int shift) {
-    int hAlign = 0;
+    int hAlign;
     if (align == HtmlProperties.HorizontalAlignment.LEFT) {
       hAlign = shift;
     } else if (align == HtmlProperties.HorizontalAlignment.RIGHT) {

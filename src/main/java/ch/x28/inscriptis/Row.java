@@ -15,6 +15,8 @@
  */
 package ch.x28.inscriptis;
 
+import ch.x28.inscriptis.models.TableCellCanvas;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -145,13 +147,5 @@ class Row {
 		List<Integer> a = cellColumns.stream().map(TableCellCanvas::getWidth).collect(Collectors.toList());
 		int s = a.stream().mapToInt(Integer::intValue).sum();
 		return s + cellSeparator.length() * (cellColumns.size() - 1);
-	}
-
-	public List<List<String>> getBlocks() {
-		List<List<String>> res = new ArrayList<>();
-		for (TableCellCanvas cell: cellColumns) {
-			res.add(cell.blocks);
-		}
-		return res;
 	}
 }

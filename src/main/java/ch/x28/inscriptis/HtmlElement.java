@@ -17,8 +17,8 @@ package ch.x28.inscriptis;
 
 import ch.x28.inscriptis.HtmlProperties.Display;
 import ch.x28.inscriptis.HtmlProperties.WhiteSpace;
+import ch.x28.inscriptis.models.Canvas;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -80,6 +80,7 @@ public class HtmlElement {
 	private Canvas canvas;
 
 	private HtmlProperties.HorizontalAlignment align  = HtmlProperties.HorizontalAlignment.LEFT;
+
 	private HtmlProperties.VerticalAlignment valign  = HtmlProperties.VerticalAlignment.TOP;
 
 	public HtmlProperties.HorizontalAlignment getAlign() {

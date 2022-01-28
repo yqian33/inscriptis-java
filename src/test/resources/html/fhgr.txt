@@ -1,0 +1,62 @@
+heading : Fachhochschule Graubünden - FH Graubünden
+h1 : Fachhochschule Graubünden - FH Graubünden
+heading : Hauptnavigation
+h2 : Hauptnavigation
+heading : Language Navigation
+h2 : Language Navigation
+heading :
+h2 :
+fact-box : Information Coronavirus
+
+            Zu den Massnahmen der FH Graubünden
+heading : Information für:
+h2 : Information für:
+heading :
+h2 :
+heading :
+h2 :
+heading :
+h2 :
+heading :
+h2 :
+heading :
+h2 :
+heading :
+h2 :
+heading : Footer
+h2 : Footer
+
+
+====
+heading: Fachhochschule Graubünden - FH Graubünden
+h1: Fachhochschule Graubünden - FH Graubünden
+heading: Hauptnavigation
+h2: Hauptnavigation
+heading: Language Navigation
+h2: Language Navigation
+heading: Die FH Graubünden ist persönlich in Studium und Forschung
+h2: Die FH Graubünden ist persönlich in Studium und Forschung
+fact-box: Information Coronavirus
+
+            Zu den Massnahmen der FH Graubünden
+fact-box: Information Coronavirus
+
+            Zu den Massnahmen der FH Graubünden
+heading: Information für:
+h2: Information für:
+heading: Nachwuchsförderung, Fachveranstaltungen, Ausstellungen und Vorträge – nehmen Sie teil.
+h2: Nachwuchsförderung, Fachveranstaltungen, Ausstellungen und Vorträge – nehmen Sie teil.
+heading: Als Absolventin oder Absolvent unserer Studienangebote sind Sie gefragt.
+h2: Als Absolventin oder Absolvent unserer Studienangebote sind Sie gefragt.
+heading: Unsere Weiterbildungsangebote werden laufend an die Bedürfnisse der Wirtschaft angepasst.
+h2: Unsere Weiterbildungsangebote werden laufend an die Bedürfnisse der Wirtschaft angepasst.
+heading: Bleiben Sie auf dem Laufenden mit den News aus unseren Bereichen.
+h2: Bleiben Sie auf dem Laufenden mit den News aus unseren Bereichen.
+heading: Unsere Forschung findet für Sie massgeschneiderte Lösungen zu lokalen und globalen Themen.
+h2: Unsere Forschung findet für Sie massgeschneiderte Lösungen zu lokalen und globalen Themen.
+heading: Ihre Projekte profitieren von unserem Fachwissen und unserer Infrastruktur.
+h2: Ihre Projekte profitieren von unserem Fachwissen und unserer Infrastruktur.
+heading: Footer
+h2: Footer
+
+

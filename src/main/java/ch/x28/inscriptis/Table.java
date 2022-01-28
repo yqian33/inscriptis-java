@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ch.x28.inscriptis.HtmlProperties.HorizontalAlignment;
+import ch.x28.inscriptis.models.Canvas;
+import ch.x28.inscriptis.models.TableCellCanvas;
 
 /**
  * An HTML table.
@@ -33,9 +35,6 @@ class Table {
 	private final List<Row> rows = new ArrayList<>();
 	private boolean tdOpen = false;
 	private String cellSeparator;
-	public String getCellSeparator() {
-		return cellSeparator;
-	}
 
 	public Table setCellSeparator(String cellSeparator) {
 		this.cellSeparator = cellSeparator;

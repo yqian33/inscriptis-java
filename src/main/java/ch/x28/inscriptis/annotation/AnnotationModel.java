@@ -16,23 +16,6 @@ public class AnnotationModel {
   private List<AnnotationParser> cssAttr = new ArrayList<>();
   private CssProfile css;
 
-  public List<AnnotationParser> getCssAttr() {
-    return cssAttr;
-  }
-
-  public void setCssAttr(List<AnnotationParser> cssAttr) {
-    this.cssAttr = cssAttr;
-  }
-
-  public CssProfile getCss() {
-    return css;
-  }
-
-  public void setCss(CssProfile css) {
-    this.css = css;
-  }
-
-
   public AnnotationModel(CssProfile cssProfile, Map<String, List<String>> model) {
     Map<String, List<String>> tagToAnnotations = parse(model);
     for (Map.Entry<String, List<String>> kv : tagToAnnotations.entrySet()) {
@@ -53,7 +36,7 @@ public class AnnotationModel {
   }
 
 
-  public Map<String, List<String>> parse(Map<String, List<String>> model) {
+  Map<String, List<String>> parse(Map<String, List<String>> model) {
 
     Map<String, List<String>> tagToAnnotations = new HashMap<>();
 
@@ -80,5 +63,21 @@ public class AnnotationModel {
     }
 
     return tagToAnnotations;
+  }
+
+  public List<AnnotationParser> getCssAttr() {
+    return cssAttr;
+  }
+
+  public void setCssAttr(List<AnnotationParser> cssAttr) {
+    this.cssAttr = cssAttr;
+  }
+
+  public CssProfile getCss() {
+    return css;
+  }
+
+  public void setCss(CssProfile css) {
+    this.css = css;
   }
 }

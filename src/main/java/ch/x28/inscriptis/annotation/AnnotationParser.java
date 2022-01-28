@@ -9,22 +9,6 @@ import org.apache.commons.lang.StringUtils;
 
 public class AnnotationParser implements IParser {
 
-  public String getAttr() {
-    return attr;
-  }
-
-  public void setAttr(String attr) {
-    this.attr = attr;
-  }
-
-  public List<String> getAnnotations() {
-    return annotations;
-  }
-
-  public void setAnnotations(List<String> annotations) {
-    this.annotations = annotations;
-  }
-
   private String attr;
   private String matchTag;
   private String matchValue;
@@ -54,7 +38,6 @@ public class AnnotationParser implements IParser {
       htmlElement.setAnnotation(new HashSet<>());
     }
     htmlElement.getAnnotation().addAll(annotations);
-    // System.out.println("Set tag annotation:" + annotations  + ":" + htmlElement);
 
   }
 
@@ -64,5 +47,29 @@ public class AnnotationParser implements IParser {
         ", matchTag=" + matchTag +
         ", matchValue=" + matchValue +
         ", annotations=" + annotations + "]";
+  }
+
+  public String getAttr() {
+    return attr;
+  }
+
+  public void setAttr(String attr) {
+    this.attr = attr;
+  }
+
+  public List<String> getAnnotations() {
+    return annotations;
+  }
+
+  public void setAnnotations(List<String> annotations) {
+    this.annotations = annotations;
+  }
+
+  public String getMatchTag() {
+    return matchTag;
+  }
+
+  public String getMatchValue() {
+    return matchValue;
   }
 }

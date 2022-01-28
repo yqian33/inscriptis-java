@@ -41,7 +41,7 @@ public class CssProfile {
 
 	static {
 		Map<String, HtmlElement> strict = new HashMap<>();
-		strict.put("body", new HtmlElement("body", Display.INLINE, WhiteSpace.NORMAL));
+		strict.put("body", new HtmlElement("body", Display.BLOCK, WhiteSpace.NORMAL));
 		strict.put("head", new HtmlElement("head", Display.NONE));
 		strict.put("link", new HtmlElement("link", Display.NONE));
 		strict.put("meta", new HtmlElement("meta", Display.NONE));

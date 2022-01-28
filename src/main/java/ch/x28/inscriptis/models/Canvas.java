@@ -1,4 +1,9 @@
-package ch.x28.inscriptis;
+package ch.x28.inscriptis.models;
+
+import ch.x28.inscriptis.HtmlElement;
+import ch.x28.inscriptis.HtmlProperties;
+import ch.x28.inscriptis.Prefix;
+import ch.x28.inscriptis.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,9 +13,9 @@ import java.util.Map;
 public class Canvas {
 
   public static class Annotation {
-    Long start;
-    Long end;
-    String metadata;
+    public Long start;
+    public Long end;
+    public String metadata;
 
     public Annotation(Long start, Long end, String metadata) {
       this.start = start;
@@ -26,21 +31,13 @@ public class Canvas {
     }
   }
 
-  private Long margin = 1000L; // margin to the previous block
+  private int margin = 1000; // margin to the previous block
   public Block currentBlock = new Block(0L, new Prefix());
   public List<String> blocks = new ArrayList<>();
   private List<Annotation> annotations = new ArrayList<>();
   private Map<HtmlElement, Long> openAnnotations = new HashMap<>();
 
-  public List<Annotation> getAnnotations() {
-    return annotations;
-  }
-
-  public List<String> getBlocks() {
-    return blocks;
-  }
-
-  public List<String> addBlock(String content) {
+  List<String> addBlock(String content) {
     // System.out.println("Add block: " + content + ":" + this.blocks);
     this.blocks.add(content);
     // System.out.println("Added block " + this.blocks);
@@ -60,6 +57,7 @@ public class Canvas {
   }
 
   public void openTag(HtmlElement tag) {
+
     if (tag.getAnnotation() != null && tag.getAnnotation().size() != 0) {
       this.openAnnotations.put(tag, currentBlock.getIndex());
     }
@@ -70,18 +68,20 @@ public class Canvas {
   }
 
   public void openBlock(HtmlElement tag) {
-    if (!flushInline() && tag.getListBullet() != null) {
-        writeUnconsumedBullet();
+
+    if (!flushInline() && tag.getListBullet() != null && !tag.getListBullet().isEmpty()) {
+      writeUnconsumedBullet();
     }
+
     currentBlock.getPrefixObj().registerPrefix(tag.getPadding(), tag.getListBullet());
 
     int requiredMargin = Math.max(tag.getPreviousMarginAfter(), tag.getMarginBefore());
     if (requiredMargin > margin) {
-      Long requiredNewlines = requiredMargin - margin;
+      int requiredNewlines = requiredMargin - margin;
       currentBlock.setIndex(currentBlock.getIndex() + requiredNewlines);
-      String newLines = StringUtils.repeat("\n", requiredNewlines.intValue()-1);
+      String newLines = StringUtils.repeat("\n", requiredNewlines-1);
       addBlock(newLines);
-      margin = (long) requiredMargin;
+      margin = requiredMargin;
     }
   }
 
@@ -109,10 +109,10 @@ public class Canvas {
 
   public void closeBlock(HtmlElement tag) {
     if (tag.getMarginAfter() > margin) {
-      Long requiredNewlines = tag.getMarginAfter() - margin;
+      int requiredNewlines = tag.getMarginAfter() - margin;
       currentBlock.setIndex(currentBlock.getIndex() + requiredNewlines);
-      addBlock(StringUtils.repeat("\n", requiredNewlines.intValue()-1));
-      margin = (long) tag.getMarginAfter();
+      addBlock(StringUtils.repeat("\n", requiredNewlines-1));
+      margin = tag.getMarginAfter();
     }
   }
 
@@ -121,7 +121,7 @@ public class Canvas {
     if (!StringUtils.isEmpty(currentContent)) {
       addBlock(currentContent);
       currentBlock = currentBlock.newBlock();
-      margin = 0L;
+      margin = 0;
       return true;
     }
     return false;
@@ -135,7 +135,7 @@ public class Canvas {
     addBlock(bullet);
     currentBlock.setIndex(currentBlock.getIndex() + bullet.length());
     currentBlock = currentBlock.newBlock();
-    margin = 0L;
+    margin = 0;
   }
 
   public void write(HtmlElement tag, String text, HtmlProperties.WhiteSpace whiteSpace) {
@@ -155,5 +155,17 @@ public class Canvas {
 
   public int getLeftMargin() {
     return currentBlock.getPrefixObj().getCurrentPadding();
+  }
+
+  public List<Annotation> getAnnotations() {
+    return annotations;
+  }
+
+  public List<String> getBlocks() {
+    return blocks;
+  }
+
+  public void setBlocks(List<String> blocks) {
+    this.blocks = blocks;
   }
 }

@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * @author Sascha Wolski
  * @author Matthias Hewelt
  */
-class Line {
+public class Line {
 
 	private int marginBefore = 0;
 	private int marginAfter = 0;
