@@ -159,6 +159,7 @@ public class Inscriptis {
 	}
 
 	private void endTable() {
+
 		if (!currentTable.isEmpty() && currentTable.peek().isTdOpen()) {
 			endTd();
 		}
@@ -176,7 +177,7 @@ public class Inscriptis {
 		}
 
 		Long startIndex = preTag.getCanvas().currentBlock.getIndex();
-		preTag.writeVerbatimText(table.getContentText());
+		preTag.writeVerbatimText(table.getCanvasText());
 		preTag.getCanvas().flushInline();
 
 		// transfer annotations from the current tag
@@ -292,10 +293,10 @@ public class Inscriptis {
 
 		// use the css to handle tags known to it
 		HtmlElement baseElement = config.getCss().getOrDefault(tag, Inscriptis.DEFAULT_ELEMENT)
-				.clone()
+				.clone()  // make a copy to avoid changing default css profile
 				.setTag(tag);
-		HtmlElement e = config.getAttributesHandler().applyHandlers(attrs, baseElement);
-		HtmlElement curTag = currentTag.peek().getRefinedHtmlElement(e);
+		HtmlElement element = config.getAttributesHandler().applyHandlers(attrs, baseElement);
+		HtmlElement curTag = currentTag.peek().getRefinedHtmlElement(element);
 
 		Node attrStyle = attrs.getNamedItem("style");
 		if (attrStyle != null) {
@@ -539,7 +540,6 @@ public class Inscriptis {
 			return false;
 		}
 
-		// TODO be careful here, since writeLine is called in multple places
 		currentTag.peek().getCanvas().writeNewLine();
 
 		String line = currentLine.peek().getText();

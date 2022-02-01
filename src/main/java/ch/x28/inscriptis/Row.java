@@ -107,7 +107,7 @@ class Row {
 		return String.join("\n", rowLines);
 	}
 
-	public String getContentText() {
+	public String getCanvasText() {
 
 		List<List<String>> lines = new ArrayList<>();
 		int minLen = Integer.MAX_VALUE;

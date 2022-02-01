@@ -119,9 +119,6 @@ public class DescriptionAnnotationTest {
       Inscriptis inscriptis = new Inscriptis(document, parserConfig);
       String result = inscriptis.getAnnotatedText();
 
-      System.out.println("text:" + inscriptis.getAnnotations().size());
-      printAnnotations(inscriptis.getAnnotations(), result);
-
       // then
       assertThat(result)
           .as(textFile.getFileName().toString())

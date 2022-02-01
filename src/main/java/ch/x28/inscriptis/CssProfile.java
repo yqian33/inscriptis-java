@@ -41,6 +41,7 @@ public class CssProfile {
 
 	static {
 		Map<String, HtmlElement> strict = new HashMap<>();
+		// body of Display set to BLOCK, to achieve same result as Python version
 		strict.put("body", new HtmlElement("body", Display.BLOCK, WhiteSpace.NORMAL));
 		strict.put("head", new HtmlElement("head", Display.NONE));
 		strict.put("link", new HtmlElement("link", Display.NONE));

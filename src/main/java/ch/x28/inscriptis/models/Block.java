@@ -2,7 +2,6 @@ package ch.x28.inscriptis.models;
 
 import ch.x28.inscriptis.HtmlProperties;
 import ch.x28.inscriptis.Line;
-import ch.x28.inscriptis.Prefix;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
