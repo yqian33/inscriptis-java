@@ -1,0 +1,4 @@
+- name: S3 cp file
+  # You may pin to the exact commit or the version.
+  # uses: qoqa/action-s3-cp@ff282b600243f40b58a2f733c2df812974fb3e7e
+  uses: qoqa/action-s3-cp@v1.1
